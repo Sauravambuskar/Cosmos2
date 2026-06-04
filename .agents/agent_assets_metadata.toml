@@ -1,0 +1,62 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "9QCpxRiSfm42xdqizDRib"
+uri = "file://artifacts/cosmos-realestate/public/images/hero-bg.png"
+type = "image"
+title = "Luxury apartment living room"
+
+[[generated]]
+id = "ZQpgtb1_1fuJoWauUqkQa"
+uri = "file://artifacts/cosmos-realestate/public/images/prop-1.png"
+type = "image"
+title = "Modern luxury villa exterior"
+
+[[generated]]
+id = "CSRpMSheILZlGrt4DHMjQ"
+uri = "file://artifacts/cosmos-realestate/public/images/prop-2.png"
+type = "image"
+title = "High-end commercial office space"
+
+[[generated]]
+id = "z9v1r1xUJMyU3c4xKGF5S"
+uri = "file://artifacts/cosmos-realestate/public/images/prop-3.png"
+type = "image"
+title = "Luxury penthouse bedroom"
+
+[[generated]]
+id = "oLp_WBDo7l2Q0iblJbjtj"
+uri = "file://artifacts/cosmos-realestate/public/images/prop-4.png"
+type = "image"
+title = "Modern kitchen in luxury home"
+
+[[generated]]
+id = "ItfhcT6YJibufAvJOYRu8"
+uri = "file://artifacts/cosmos-realestate/public/images/prop-5.png"
+type = "image"
+title = "Luxury apartment balcony"
+
+[[generated]]
+id = "VxnDTgGygt0RWWkGEDffn"
+uri = "file://artifacts/cosmos-realestate/public/images/prop-6.png"
+type = "image"
+title = "Elegant building lobby"
+
+[[generated]]
+id = "EA2uz_pgxFPp3aD7mcr2a"
+uri = "file://artifacts/cosmos-realestate/public/images/about-bg.png"
+type = "image"
+title = "Pune luxury real estate skyline"
+
+[[generated]]
+id = "4vpTWP-HcWCj9_EgIvL2n"
+uri = "file://artifacts/cosmos-realestate/public/images/proj-1.png"
+type = "image"
+title = "Luxury residential project"
+
+[[generated]]
+id = "ffQVZl3V4Qgb799ArvhSU"
+uri = "file://artifacts/cosmos-realestate/public/images/proj-2.png"
+type = "image"
+title = "Modern commercial project"
