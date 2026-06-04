@@ -1,47 +1,155 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
-import { MapPin, Home as HomeIcon, Maximize } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { MapPin, Maximize, Building2, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const properties = [
-  { id: 1, title: "Trump Towers", location: "Kalyani Nagar", price: "12.5 Cr", type: "Buy", config: "4.5 BHK", area: "4500 sqft", image: "/images/prop-1.png" },
-  { id: 2, title: "Panchshil Towers", location: "Kharadi", price: "9.8 Cr", type: "Buy", config: "4 BHK", area: "3800 sqft", image: "/images/prop-2.png" },
-  { id: 3, title: "Premium Retail Space", location: "Koregaon Park", price: "4.5 L/mo", type: "Commercial", config: "Retail", area: "2000 sqft", image: "/images/prop-3.png" },
-  { id: 4, title: "Marvel Zephyr", location: "Kharadi", price: "6.5 Cr", type: "Buy", config: "3 BHK", area: "2500 sqft", image: "/images/prop-4.png" },
-  { id: 5, title: "Yoo Pune", location: "Wagholi", price: "15.0 Cr", type: "Buy", config: "5 BHK", area: "5500 sqft", image: "/images/prop-5.png" },
-  { id: 6, title: "Lodha Belmondo", location: "Pune", price: "4.2 Cr", type: "Buy", config: "3 BHK", area: "2200 sqft", image: "/images/prop-6.png" },
-  { id: 7, title: "Godrej Elements", location: "Hinjewadi", price: "2.8 Cr", type: "Buy", config: "2 BHK", area: "1200 sqft", image: "/images/prop-1.png" },
-  { id: 8, title: "Amar Business Park", location: "Baner", price: "1.2 L/mo", type: "Commercial", config: "Office", area: "1500 sqft", image: "/images/prop-2.png" },
-  { id: 9, title: "Rohan Leher", location: "Baner", price: "85 L", type: "Rent", config: "3 BHK", area: "1800 sqft", image: "/images/prop-3.png" },
-  { id: 10, title: "Kalpataru Estate", location: "Pimple Gurav", price: "3.5 Cr", type: "Buy", config: "3 BHK", area: "2000 sqft", image: "/images/prop-4.png" },
-  { id: 11, title: "Gera Song of Joy", location: "Kharadi", price: "60 L/yr", type: "Rent", config: "4 BHK", area: "3200 sqft", image: "/images/prop-5.png" },
-  { id: 12, title: "WTC Pune Office", location: "Kharadi", price: "8.5 Cr", type: "Commercial", config: "Office", area: "4000 sqft", image: "/images/prop-6.png" },
+  {
+    id: 1,
+    title: "Luxury 6.5 BHK Apartment",
+    location: "Sopan Baug, Pune",
+    price: "6.10 Cr",
+    type: "Buy",
+    config: "6.5 BHK",
+    area: "4,130 sqft",
+    image: "/projects/sopan-baug-apartment.jpg",
+    tag: "Residential",
+  },
+  {
+    id: 2,
+    title: "Corporate Office Space",
+    location: "Kalyani Nagar, Pune",
+    price: "On Request",
+    type: "Commercial",
+    config: "Office",
+    area: "704 sqft onwards",
+    image: "/projects/kalyani-nagar-office.jpg",
+    tag: "Commercial",
+  },
+  {
+    id: 3,
+    title: "Premium Office & Showrooms",
+    location: "Koregaon Park, Pune",
+    price: "On Request",
+    type: "Commercial",
+    config: "Commercial",
+    area: "384–4,115 sqft",
+    image: "/projects/koregaon-park-commercial.jpeg",
+    tag: "Commercial",
+  },
+  {
+    id: 4,
+    title: "Luxury Bungalow for Rent",
+    location: "Kalyani Nagar, Pune",
+    price: "On Request",
+    type: "Rent",
+    config: "4.5 BHK",
+    area: "3,500 sqft",
+    image: "/projects/kalyani-nagar-bungalow.jpeg",
+    tag: "Residential",
+  },
+  {
+    id: 5,
+    title: "1 Acre Plot with Bungalow Rights",
+    location: "Sinhagad Road, Pune",
+    price: "6.5 Cr",
+    type: "Buy",
+    config: "Land + Bungalow",
+    area: "1 Acre (~43,560 sqft)",
+    image: "/projects/sinhagad-road-land.jpg",
+    tag: "Land",
+  },
+  {
+    id: 6,
+    title: "Co-working & Corporate Offices",
+    location: "Koregaon Park NX, Pune",
+    price: "On Request",
+    type: "Commercial",
+    config: "Bare Shell / Fitted",
+    area: "Flexible",
+    image: "/projects/koregaon-park-nx.jpg",
+    tag: "Commercial",
+  },
+  {
+    id: 7,
+    title: "Industrial Shed for Rent",
+    location: "Hinjawadi, Pune",
+    price: "3,90,000/mo",
+    type: "Rent",
+    config: "Industrial",
+    area: "20,000 sqft",
+    image: "/projects/hinjawadi-shed.jpg",
+    tag: "Industrial",
+  },
+  {
+    id: 8,
+    title: "SEZ IT Park Office Space",
+    location: "Kharadi, Pune",
+    price: "On Request",
+    type: "Commercial",
+    config: "IT / ITES / BFSI",
+    area: "2.5 M sqft (total complex)",
+    image: "/projects/kharadi-it-park.jpg",
+    tag: "Commercial",
+  },
+  {
+    id: 9,
+    title: "5-Acre Industrial Facility",
+    location: "Patal Ganga, Navi Mumbai",
+    price: "On Request",
+    type: "Rent",
+    config: "Industrial",
+    area: "1,25,000 sqft",
+    image: "/projects/patal-ganga-industrial.jpeg",
+    tag: "Industrial",
+  },
+  {
+    id: 10,
+    title: "SEZ Campus — IT & Software",
+    location: "Hinjawadi Phase 3, Pune",
+    price: "On Request",
+    type: "Commercial",
+    config: "Office / SEZ",
+    area: "13 Acres | 1.8 M sqft",
+    image: "/projects/hinjawadi-sez.jpeg",
+    tag: "Commercial",
+  },
 ];
+
+const tabs = ["All", "Buy", "Rent", "Commercial"];
 
 export default function Properties() {
   const [filter, setFilter] = useState("All");
 
-  const filteredProperties = properties.filter((p) => filter === "All" || p.type === filter);
+  const filteredProperties = properties.filter(
+    (p) => filter === "All" || p.type === filter
+  );
 
   return (
     <div className="w-full pt-28 pb-24 bg-background">
       <div className="container mx-auto px-4 md:px-8">
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <h1 className="text-5xl font-serif font-bold text-foreground mb-6">Exclusive Properties</h1>
+          <span className="text-primary font-medium tracking-widest uppercase text-sm mb-4 block">
+            Available Now
+          </span>
+          <h1 className="text-5xl font-serif font-bold text-foreground mb-6">
+            Exclusive Listings
+          </h1>
           <p className="text-lg text-muted-foreground">
-            Explore our curated portfolio of Pune's finest residential and commercial real estate.
+            Handpicked residential, commercial and industrial properties across Pune — curated by Cosmos Real Estate.
           </p>
         </div>
 
         <div className="flex justify-center mb-12">
           <Tabs defaultValue="All" onValueChange={setFilter} className="w-full max-w-2xl">
             <TabsList className="grid w-full grid-cols-4 h-14 bg-muted/50 rounded-none p-1">
-              {["All", "Buy", "Rent", "Commercial"].map((tab) => (
-                <TabsTrigger 
-                  key={tab} 
+              {tabs.map((tab) => (
+                <TabsTrigger
+                  key={tab}
                   value={tab}
                   className="rounded-none text-base data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                  data-testid={`tab-filter-${tab.toLowerCase()}`}
                 >
                   {tab}
                 </TabsTrigger>
@@ -50,60 +158,79 @@ export default function Properties() {
           </Tabs>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredProperties.map((property, index) => (
-            <motion.div
-              key={property.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: index * 0.05 }}
-              className="bg-card border border-border group"
-            >
-              <div className="relative h-[250px] overflow-hidden">
-                <img 
-                  src={property.image} 
-                  alt={property.title} 
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = `https://placehold.co/800x600/f1f5f9/64748b?text=${encodeURIComponent(property.title)}`;
-                  }}
-                />
-                <div className="absolute top-4 left-4 bg-secondary text-white px-3 py-1 text-xs font-bold tracking-wider uppercase">
-                  {property.type}
-                </div>
-                <div className="absolute bottom-4 right-4 bg-primary text-primary-foreground px-4 py-2 text-lg font-bold shadow-lg">
-                  ₹ {property.price}
-                </div>
-              </div>
-              <div className="p-6">
-                <h3 className="text-2xl font-serif font-bold mb-2">{property.title}</h3>
-                <div className="flex items-center gap-2 text-muted-foreground mb-6">
-                  <MapPin size={16} className="text-primary" />
-                  <span>{property.location}</span>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4 mb-6 border-y border-border py-4">
-                  <div className="flex items-center gap-2 text-sm text-foreground">
-                    <HomeIcon size={16} className="text-muted-foreground" />
-                    <span className="font-medium">{property.config}</span>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={filter}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+          >
+            {filteredProperties.map((property, index) => (
+              <motion.div
+                key={property.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35, delay: index * 0.06 }}
+                className="bg-card border border-border group flex flex-col"
+                data-testid={`card-property-${property.id}`}
+              >
+                <div className="relative h-[240px] overflow-hidden flex-shrink-0">
+                  <img
+                    src={property.image}
+                    alt={property.title}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                  <div className="absolute top-4 left-4 flex gap-2 flex-wrap">
+                    <span className="bg-secondary text-white px-3 py-1 text-xs font-bold tracking-wider uppercase">
+                      {property.type}
+                    </span>
+                    <span className="bg-black/50 text-white px-3 py-1 text-xs font-medium uppercase backdrop-blur-sm">
+                      {property.tag}
+                    </span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-foreground">
-                    <Maximize size={16} className="text-muted-foreground" />
-                    <span className="font-medium">{property.area}</span>
+                  <div className="absolute bottom-4 right-4 bg-primary text-primary-foreground px-4 py-2 text-sm font-bold shadow-lg">
+                    ₹ {property.price}
                   </div>
                 </div>
+                <div className="p-6 flex flex-col flex-grow">
+                  <h3 className="text-xl font-serif font-bold mb-2 leading-snug">{property.title}</h3>
+                  <div className="flex items-center gap-2 text-muted-foreground mb-5">
+                    <MapPin size={15} className="text-primary flex-shrink-0" />
+                    <span className="text-sm">{property.location}</span>
+                  </div>
 
-                <Button className="w-full rounded-none group-hover:bg-secondary group-hover:text-white transition-colors">
-                  Request Viewing
-                </Button>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+                  <div className="grid grid-cols-2 gap-4 mb-6 border-y border-border py-4 mt-auto">
+                    <div className="flex items-center gap-2 text-sm text-foreground">
+                      <Building2 size={15} className="text-muted-foreground flex-shrink-0" />
+                      <span className="font-medium truncate">{property.config}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-foreground">
+                      <Maximize size={15} className="text-muted-foreground flex-shrink-0" />
+                      <span className="font-medium truncate">{property.area}</span>
+                    </div>
+                  </div>
+
+                  <a href="https://wa.me/919325097835" target="_blank" rel="noopener noreferrer">
+                    <Button
+                      className="w-full rounded-none group-hover:bg-secondary group-hover:text-white transition-colors"
+                      data-testid={`button-viewing-${property.id}`}
+                    >
+                      <Phone size={15} className="mr-2" />
+                      Request Viewing
+                    </Button>
+                  </a>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </AnimatePresence>
 
         {filteredProperties.length === 0 && (
           <div className="text-center py-24 text-muted-foreground text-lg">
-            No properties found for this category at the moment.
+            No listings found for this category. Please contact us directly.
           </div>
         )}
       </div>
