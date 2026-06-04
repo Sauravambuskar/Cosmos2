@@ -1,6 +1,6 @@
 {
   "buildCommand": "pnpm --filter @workspace/cosmos-realestate run build",
-  "outputDirectory": "artifacts/cosmos-realestate/dist/public",
+  "outputDirectory": "artifacts/cosmos-realestate/dist",
   "installCommand": "pnpm install",
   "framework": null,
   "rewrites": [
