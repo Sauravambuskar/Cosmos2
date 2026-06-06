@@ -30,3 +30,10 @@ externalPort = 8081
 [[ports]]
 localPort = 18249
 externalPort = 3000
+
+[userenv]
+
+[userenv.shared]
+ADMIN_USERNAME = "admin"
+ADMIN_PASSWORD = "cosmos@2024"
+JWT_SECRET = "f2e05cb72edb568a25dd9d0c13fa8a56a92b0bddf5f8603f32613f659556390ad37051663af4415aca17be85577f9e08"
