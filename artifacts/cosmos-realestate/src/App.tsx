@@ -6,10 +6,10 @@ import NotFound from "@/pages/not-found";
 import Layout from "@/components/layout";
 import Home from "@/pages/home";
 import About from "@/pages/about";
-import Properties from "@/pages/properties";
-import Services from "@/pages/services";
+import Residential from "@/pages/residential";
+import Commercial from "@/pages/commercial";
+import Industrial from "@/pages/industrial";
 import Projects from "@/pages/projects";
-import Gallery from "@/pages/gallery";
 import Contact from "@/pages/contact";
 
 const queryClient = new QueryClient();
@@ -19,10 +19,10 @@ function Router() {
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/about" component={About} />
-      <Route path="/properties" component={Properties} />
-      <Route path="/services" component={Services} />
+      <Route path="/residential" component={Residential} />
+      <Route path="/commercial" component={Commercial} />
+      <Route path="/industrial" component={Industrial} />
       <Route path="/projects" component={Projects} />
-      <Route path="/gallery" component={Gallery} />
       <Route path="/contact" component={Contact} />
       <Route component={NotFound} />
     </Switch>

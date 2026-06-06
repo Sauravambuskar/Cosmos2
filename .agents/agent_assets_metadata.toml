@@ -60,3 +60,63 @@ id = "ffQVZl3V4Qgb799ArvhSU"
 uri = "file://artifacts/cosmos-realestate/public/images/proj-2.png"
 type = "image"
 title = "Modern commercial project"
+
+[[generated]]
+id = "NQqUHpNDkiwTiUClgBWDF"
+uri = "file://artifacts/cosmos-realestate/public/images/res-1.png"
+type = "image"
+title = "modern luxury apartment exterior"
+
+[[generated]]
+id = "KBj7r21ZqdjWW1bvhEtrh"
+uri = "file://artifacts/cosmos-realestate/public/images/res-2.png"
+type = "image"
+title = "premium bungalow exterior"
+
+[[generated]]
+id = "duiEcu9NBkN2SaP4SRPBv"
+uri = "file://artifacts/cosmos-realestate/public/images/res-3.png"
+type = "image"
+title = "luxury row house exterior"
+
+[[generated]]
+id = "AAMn0mbkdvpSDHm7zitpC"
+uri = "file://artifacts/cosmos-realestate/public/images/res-4.png"
+type = "image"
+title = "modern apartment interior"
+
+[[generated]]
+id = "GlnUMzrHZJdMrCsUmNrPv"
+uri = "file://artifacts/cosmos-realestate/public/images/com-1.png"
+type = "image"
+title = "modern office building"
+
+[[generated]]
+id = "gKj9r6woFGZs8iGZNlbc6"
+uri = "file://artifacts/cosmos-realestate/public/images/com-2.png"
+type = "image"
+title = "coworking space interior"
+
+[[generated]]
+id = "mB-KGFCqymKlr_Pht-k-r"
+uri = "file://artifacts/cosmos-realestate/public/images/com-3.png"
+type = "image"
+title = "premium retail shop exterior"
+
+[[generated]]
+id = "MDEC3BPo4hOITZkNP6_J-"
+uri = "file://artifacts/cosmos-realestate/public/images/ind-1.png"
+type = "image"
+title = "large warehouse exterior"
+
+[[generated]]
+id = "uFBSchELboLtxIwOalH6d"
+uri = "file://artifacts/cosmos-realestate/public/images/ind-2.png"
+type = "image"
+title = "industrial factory shed"
+
+[[generated]]
+id = "Lws6ihonornghDo-RFIt2"
+uri = "file://artifacts/cosmos-realestate/public/images/ind-3.png"
+type = "image"
+title = "large cold storage facility"
