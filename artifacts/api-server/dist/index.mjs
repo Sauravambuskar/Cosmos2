@@ -59728,13 +59728,43 @@ var insertContactSchema = createInsertSchema(contactsTable).omit({
 
 // ../../lib/db/src/index.ts
 var { Pool: Pool3 } = esm_default;
-if (!process.env.DATABASE_URL) {
-  throw new Error(
-    "DATABASE_URL must be set. Did you forget to provision a database?"
-  );
+var _pool = null;
+var _db = null;
+function getPool() {
+  if (!_pool) {
+    const connectionString = process.env.DATABASE_URL;
+    if (!connectionString) {
+      throw new Error(
+        "DATABASE_URL must be set. Did you forget to provision a database?"
+      );
+    }
+    const isSupabase = connectionString.includes("supabase.co") || connectionString.includes("supabase.com") || connectionString.includes("pooler.supabase.com");
+    _pool = new Pool3({
+      connectionString,
+      ssl: isSupabase ? { rejectUnauthorized: false } : void 0
+    });
+  }
+  return _pool;
 }
-var pool = new Pool3({ connectionString: process.env.DATABASE_URL });
-var db = drizzle(pool, { schema: schema_exports });
+function getDb() {
+  if (!_db) {
+    _db = drizzle(getPool(), { schema: schema_exports });
+  }
+  return _db;
+}
+var pool = new Proxy({}, {
+  get(_target, prop) {
+    return getPool()[prop];
+  }
+});
+var db = new Proxy(
+  {},
+  {
+    get(_target, prop) {
+      return getDb()[prop];
+    }
+  }
+);
 
 // src/routes/admin/properties.ts
 var router3 = (0, import_express3.Router)();
