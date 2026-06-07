@@ -1,0 +1,12 @@
+{
+  "buildCommand": "cd ../.. && pnpm install --frozen-lockfile && pnpm --filter @workspace/cosmos-realestate run build",
+  "outputDirectory": "dist/public",
+  "installCommand": "echo 'install handled by buildCommand'",
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
