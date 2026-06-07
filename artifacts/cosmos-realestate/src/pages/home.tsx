@@ -67,7 +67,7 @@ export default function Home() {
 
             <div className="bg-white p-4 rounded-xl shadow-2xl max-w-4xl mx-auto">
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsList className="grid w-[320px] grid-cols-3 mb-4 bg-muted/20">
+                <TabsList className="grid w-[320px] grid-cols-3 mb-4 bg-muted/20 mx-auto">
                   <TabsTrigger value="buy" className="text-sm font-semibold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Buy</TabsTrigger>
                   <TabsTrigger value="rent" className="text-sm font-semibold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Rent</TabsTrigger>
                   <TabsTrigger value="sell" className="text-sm font-semibold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Sell</TabsTrigger>
@@ -226,10 +226,10 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
-              { icon: ShieldCheck, title: "Verified Listings", desc: "100% physically verified properties with clear titles." },
-              { icon: TrendingUp, title: "Market Experts", desc: "20+ years of deep knowledge of Pune's real estate trends." },
-              { icon: CheckCircle, title: "NAR India Certified", desc: "Life member of NAR India, ensuring highest ethical standards." },
-              { icon: Key, title: "End-to-End Service", desc: "From discovery to registration and possession, we handle it all." }
+              { image: "/images/why-verified.png", title: "Verified Listings", desc: "100% physically verified properties with clear titles." },
+              { image: "/images/why-expert.png", title: "Market Experts", desc: "20+ years of deep knowledge of Pune's real estate trends." },
+              { image: "/images/why-cert.png", title: "NAR India Certified", desc: "Life member of NAR India, ensuring highest ethical standards." },
+              { image: "/images/why-service.png", title: "End-to-End Service", desc: "From discovery to registration and possession, we handle it all." }
             ].map((feature, index) => (
               <motion.div
                 key={index}
@@ -237,10 +237,14 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: index * 0.1 }}
-                className="bg-white p-8 rounded-xl shadow-sm text-center border border-border/50 hover:border-primary/30 transition-colors"
+                className="bg-white p-8 rounded-xl shadow-sm text-center border border-border/50 hover:border-primary/30 transition-colors flex flex-col items-center"
               >
-                <div className="w-16 h-16 mx-auto bg-primary/10 rounded-full flex items-center justify-center mb-6 text-primary">
-                  <feature.icon size={32} />
+                <div className="w-24 h-24 mb-6 flex items-center justify-center overflow-hidden">
+                  <img 
+                    src={feature.image} 
+                    alt={feature.title} 
+                    className="w-full h-full object-contain hover:scale-105 transition-transform duration-300"
+                  />
                 </div>
                 <h3 className="text-xl font-bold mb-3 text-foreground">{feature.title}</h3>
                 <p className="text-muted-foreground text-sm leading-relaxed">{feature.desc}</p>
