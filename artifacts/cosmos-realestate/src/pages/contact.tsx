@@ -10,6 +10,11 @@ import { useToast } from "@/hooks/use-toast";
 
 export default function Contact() {
   const { toast } = useToast();
+  
+  // Parse interest from query parameter if present
+  const params = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
+  const interestParam = params.get("interest") || "buy_residential";
+  const [interest, setInterest] = useState(interestParam);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,7 +65,7 @@ export default function Contact() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-foreground">I am interested in *</label>
-                  <Select defaultValue="buy_residential">
+                  <Select value={interest} onValueChange={setInterest}>
                     <SelectTrigger className="h-12 bg-secondary/30 focus:ring-primary">
                       <SelectValue placeholder="Select interest" />
                     </SelectTrigger>

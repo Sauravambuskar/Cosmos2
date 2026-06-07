@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Search, MapPin, Building, Home as HomeIcon, ArrowRight, ShieldCheck, CheckCircle, TrendingUp, Key } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,6 +26,21 @@ const featuredProperties = [
 ];
 
 export default function Home() {
+  const [, setLocation] = useLocation();
+  const [searchVal, setSearchVal] = useState("");
+  const [activeTab, setActiveTab] = useState("buy");
+
+  const handleSearch = () => {
+    if (activeTab === "sell") {
+      setLocation("/contact?interest=sell_property");
+    } else {
+      const queryParams = new URLSearchParams();
+      if (searchVal) queryParams.append("search", searchVal);
+      queryParams.append("type", activeTab);
+      setLocation(`/residential?${queryParams.toString()}`);
+    }
+  };
+
   return (
     <div className="w-full">
       {/* Hero Section */}
@@ -50,24 +66,49 @@ export default function Home() {
             </p>
 
             <div className="bg-white p-4 rounded-xl shadow-2xl max-w-4xl mx-auto">
-              <Tabs defaultValue="buy" className="w-full">
-                <TabsList className="grid w-[240px] grid-cols-2 mb-4 bg-muted/20">
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                <TabsList className="grid w-[320px] grid-cols-3 mb-4 bg-muted/20">
                   <TabsTrigger value="buy" className="text-sm font-semibold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Buy</TabsTrigger>
                   <TabsTrigger value="rent" className="text-sm font-semibold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Rent</TabsTrigger>
+                  <TabsTrigger value="sell" className="text-sm font-semibold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Sell</TabsTrigger>
                 </TabsList>
                 
-                <div className="flex flex-col md:flex-row gap-3">
-                  <div className="relative flex-grow">
-                    <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
-                    <Input 
-                      placeholder="Enter Locality, Project or Landmark..." 
-                      className="pl-10 h-14 rounded-md border-border text-base bg-muted/10 focus-visible:ring-primary"
-                    />
+                {activeTab === "sell" ? (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex flex-col md:flex-row items-center justify-between gap-4 p-3 bg-primary/5 rounded-lg border border-primary/20"
+                  >
+                    <div className="text-left pl-2">
+                      <h4 className="font-serif font-bold text-foreground text-lg">Looking to Sell or Lease Your Property in Pune?</h4>
+                      <p className="text-muted-foreground text-sm">List it with Cosmos Real Estate for 100% verified buyers & hassle-free deal closure.</p>
+                    </div>
+                    <Button asChild className="h-14 px-10 text-base font-bold bg-primary hover:bg-primary/90 text-white rounded-md shrink-0">
+                      <Link href="/contact?interest=sell_property">List Your Property</Link>
+                    </Button>
+                  </motion.div>
+                ) : (
+                  <div className="flex flex-col md:flex-row gap-3">
+                    <div className="relative flex-grow">
+                      <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
+                      <Input 
+                        placeholder={activeTab === "buy" ? "Enter Locality, Project or Landmark to Buy..." : "Enter Locality, Project or Landmark to Rent..."}
+                        value={searchVal}
+                        onChange={(e) => setSearchVal(e.target.value)}
+                        className="pl-10 h-14 rounded-md border-border text-base bg-muted/10 focus-visible:ring-primary"
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") handleSearch();
+                        }}
+                      />
+                    </div>
+                    <Button 
+                      onClick={handleSearch}
+                      className="h-14 px-10 text-base font-bold bg-primary hover:bg-primary/90 text-white rounded-md shrink-0"
+                    >
+                      <Search className="mr-2" size={20} /> Search
+                    </Button>
                   </div>
-                  <Button className="h-14 px-10 text-base font-bold bg-primary hover:bg-primary/90 text-white rounded-md shrink-0">
-                    <Search className="mr-2" size={20} /> Search
-                  </Button>
-                </div>
+                )}
               </Tabs>
             </div>
 
