@@ -2,6 +2,9 @@
 
 # compiled output
 dist
+!artifacts/api-server/dist/
+!artifacts/api-server/dist/index.html
+!artifacts/api-server/dist/README.md
 tmp
 out-tsc
 *.tsbuildinfo

@@ -1,9 +1,9 @@
 {
-  "version": 2,
   "buildCommand": "pnpm --filter @workspace/cosmos-realestate run build",
-  "outputDirectory": "artifacts/cosmos-realestate/dist",
+  "outputDirectory": "artifacts/cosmos-realestate/dist/public",
   "installCommand": "pnpm install --frozen-lockfile",
-  "framework": null,
+  "cleanUrls": true,
+  "trailingSlash": false,
   "rewrites": [
     {
       "source": "/(.*)",
