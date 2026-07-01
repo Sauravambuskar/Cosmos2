@@ -3,14 +3,9 @@
   "outputDirectory": "artifacts/cosmos-realestate/dist/public",
   "installCommand": "echo skip",
   "cleanUrls": true,
-  "rewrites": [
-    {
-      "source": "/api/:path*",
-      "destination": "/api"
-    },
-    {
-      "source": "/((?!api/|assets/).*)",
-      "destination": "/index.html"
-    }
+  "routes": [
+    { "handle": "filesystem" },
+    { "src": "/api/(.*)", "dest": "/api" },
+    { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
