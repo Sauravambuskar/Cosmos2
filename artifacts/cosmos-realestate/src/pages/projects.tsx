@@ -17,10 +17,17 @@ const projects = [
 ];
 
 const featuredStats = [
-  { icon: Ruler,   label: "Total Area",        value: "1,38,000 Sq. Ft." },
+  { icon: Ruler,   label: "Total Area",        value: "19,000 Sq. Ft." },
   { icon: Clock,   label: "Delivered In",       value: "12 Months"        },
   { icon: Factory, label: "Development Type",   value: "Grade-A Industrial" },
   { icon: Award,   label: "Project Basis",      value: "EPC Turnkey"      },
+];
+
+const esrStats = [
+  { icon: MapPin,   label: "Location",      value: "Talegaon"                 },
+  { icon: Award,    label: "Park Standard", value: "Grade-A"                  },
+  { icon: Factory,  label: "Park Type",     value: "Industrial & Logistics"   },
+  { icon: Building, label: "Connectivity",  value: "Mumbai–Pune Expressway"   },
 ];
 
 function VimeoEmbed() {
@@ -62,7 +69,7 @@ function VimeoEmbed() {
     >
       <iframe
         ref={iframeRef}
-        src="https://player.vimeo.com/video/1206086300?badge=0&autopause=0&player_id=0&app_id=58479&controls=0&title=0&byline=0&portrait=0"
+        src="https://player.vimeo.com/video/1207352854?badge=0&autopause=0&player_id=0&app_id=58479&controls=0&title=0&byline=0&portrait=0"
         frameBorder="0"
         allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media"
         referrerPolicy="strict-origin-when-cross-origin"
@@ -151,7 +158,7 @@ export default function Projects() {
               {/* Left — description + stats */}
               <div>
                 <p className="text-foreground/75 leading-relaxed mb-7 text-[15px]">
-                  A landmark <span className="font-semibold text-foreground">1,38,000 sq. ft.</span> Build-to-Suit
+                  A landmark <span className="font-semibold text-foreground">19,000 sq. ft.</span> Build-to-Suit
                   industrial development featuring a state-of-the-art industrial shed integrated with a modern office
                   building. Designed for operational efficiency, scalability, and corporate functionality — executed on
                   a turnkey EPC basis and delivered for a leading multinational corporation within 12 months.
@@ -180,6 +187,101 @@ export default function Projects() {
                 <VimeoEmbed />
                 <p className="text-muted-foreground text-xs text-center">
                   Click video or use the Play / Pause button to control
+                </p>
+              </div>
+
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ── ESR Talegaon Featured Property ───────────────────────── */}
+      <section className="py-14 bg-secondary/20">
+        <div className="container mx-auto px-4 md:px-8">
+
+          {/* Section label */}
+          <div className="flex items-center gap-3 mb-8">
+            <div className="h-0.5 w-8 bg-primary rounded-full" />
+            <span className="text-primary font-semibold text-xs uppercase tracking-[0.18em]">Featured Property</span>
+          </div>
+
+          {/* Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="bg-white rounded-2xl overflow-hidden shadow-lg border border-border"
+          >
+            {/* Banner */}
+            <div className="relative h-56 md:h-72 overflow-hidden bg-foreground">
+              <img
+                src="/images/ind-2.png"
+                alt="ESR Talegaon Industrial & Logistics Park"
+                className="w-full h-full object-cover opacity-60"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-foreground/95 via-foreground/70 to-transparent" />
+              <div className="absolute inset-0 flex flex-col justify-end p-8">
+                <Badge className="bg-blue-600 hover:bg-blue-600 text-white w-fit mb-3 text-xs">
+                  Grade-A Park
+                </Badge>
+                <h2 className="text-2xl md:text-3xl font-serif font-bold text-white leading-tight mb-1">
+                  ESR Talegaon Industrial &amp; Logistics Park
+                </h2>
+                <p className="text-white/75 text-sm flex items-center gap-1.5">
+                  <MapPin size={13} />
+                  Talegaon &nbsp;·&nbsp; Mumbai–Pune Expressway Corridor
+                </p>
+              </div>
+            </div>
+
+            {/* Body */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-8">
+
+              {/* Left — description + stats */}
+              <div>
+                <p className="text-foreground/75 leading-relaxed mb-7 text-[15px]">
+                  Grade-A industrial and logistics park at Talegaon — strategically located on the{" "}
+                  <span className="font-semibold text-foreground">Mumbai–Pune Expressway</span> corridor with
+                  world-class infrastructure and connectivity.
+                </p>
+
+                <div className="grid grid-cols-2 gap-3 mb-7">
+                  {esrStats.map(({ icon: Icon, label, value }) => (
+                    <div
+                      key={label}
+                      className="bg-secondary/50 border border-border rounded-xl p-4 flex flex-col gap-2"
+                    >
+                      <div className="w-9 h-9 bg-white rounded-lg flex items-center justify-center text-primary shadow-sm shrink-0">
+                        <Icon size={17} />
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground text-xs font-medium mb-0.5">{label}</p>
+                        <p className="text-foreground font-bold text-sm">{value}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <Button className="bg-primary text-white hover:bg-primary/90 h-11 px-6 text-sm font-semibold">
+                  Enquire About ESR Talegaon
+                </Button>
+              </div>
+
+              {/* Right — YouTube video */}
+              <div className="flex flex-col gap-3">
+                <div className="relative rounded-xl overflow-hidden shadow-md bg-black" style={{ paddingTop: "56.25%" }}>
+                  <iframe
+                    src="https://www.youtube.com/embed/iq00NsX04dc?rel=0&modestbranding=1"
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}
+                    title="ESR Talegaon Industrial & Logistics Park"
+                  />
+                </div>
+                <p className="text-muted-foreground text-xs text-center">
+                  ESR Talegaon — Industrial &amp; Logistics Park walkthrough
                 </p>
               </div>
 
