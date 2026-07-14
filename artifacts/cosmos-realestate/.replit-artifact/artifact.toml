@@ -1,0 +1,27 @@
+kind = "web"
+previewPath = "/"
+title = "Cosmos Real Estate"
+version = "1.0.0"
+id = "artifacts/cosmos-realestate"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 18249
+
+[services.development]
+run = "pnpm --filter @workspace/cosmos-realestate run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/cosmos-realestate", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/cosmos-realestate/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "18249"
+BASE_PATH = "/"
