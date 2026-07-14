@@ -1,5 +1,9 @@
 {
-  "buildCommand": "echo 'API server is not a Vercel deployment target. Deploy artifacts/cosmos-realestate instead.'",
-  "outputDirectory": "dist",
-  "installCommand": "echo skip"
+  "buildCommand": "cd ../.. && pnpm install --frozen-lockfile && pnpm --filter @workspace/cosmos-realestate run build",
+  "outputDirectory": "../cosmos-realestate/dist/public",
+  "installCommand": "echo skip",
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
 }
