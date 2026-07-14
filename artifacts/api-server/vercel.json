@@ -1,0 +1,5 @@
+{
+  "buildCommand": "echo 'API server is not a Vercel deployment target. Deploy artifacts/cosmos-realestate instead.'",
+  "outputDirectory": "dist",
+  "installCommand": "echo skip"
+}
