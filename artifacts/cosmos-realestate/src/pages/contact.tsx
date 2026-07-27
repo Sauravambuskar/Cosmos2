@@ -157,7 +157,7 @@ export default function Contact() {
                   </div>
                   <div>
                     <h4 className="font-bold text-sm mb-1 text-foreground">Phone & WhatsApp</h4>
-                    <p className="text-muted-foreground text-sm mb-1">+91 9823056983</p>
+                    <p className="text-muted-foreground text-sm mb-1">+91 9325097835</p>
                     <p className="text-muted-foreground text-sm">+91 20 26152956 (Tele/Fax)</p>
                   </div>
                 </div>
@@ -187,7 +187,7 @@ export default function Contact() {
             </div>
 
             <Button asChild className="w-full bg-[#25D366] hover:bg-[#128C7E] text-white h-14 text-base font-bold shadow-md">
-              <a href="https://wa.me/919823056983" target="_blank" rel="noopener noreferrer">
+              <a href="https://wa.me/919325097835" target="_blank" rel="noopener noreferrer">
                 <SiWhatsapp className="mr-2" size={24} /> Chat on WhatsApp
               </a>
             </Button>

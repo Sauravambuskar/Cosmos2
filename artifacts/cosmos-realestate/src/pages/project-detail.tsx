@@ -264,8 +264,8 @@ export default function ProjectDetail() {
 
               <div className="mt-6 pt-6 border-t border-border">
                 <p className="text-xs text-muted-foreground mb-2">Call us directly</p>
-                <a href="tel:+919823056983" className="text-primary font-bold text-lg hover:underline">
-                  +91 9823056983
+                <a href="tel:+919325097835" className="text-primary font-bold text-lg hover:underline">
+                  +91 9325097835
                 </a>
               </div>
             </motion.div>
