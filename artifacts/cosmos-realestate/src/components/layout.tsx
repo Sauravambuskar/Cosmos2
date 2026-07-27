@@ -310,7 +310,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
           <div className="border-t border-white/10 pt-6 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-white/50">
             <p>&copy; {new Date().getFullYear()} Cosmos Real Estate. All rights reserved.</p>
-            <p>Designed like India's top property portals.</p>
+            <p>Designed by Ignite India</p>
           </div>
         </div>
       </footer>
