@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link, useLocation } from "wouter";
-import { Search, MapPin, Building, Home as HomeIcon, ArrowRight, ShieldCheck, CheckCircle, TrendingUp, Key } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { Search, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { fetchProperties, primaryImage, areaLabel, categoryLabel } from "@/lib/api";
 
 const stats = [
   { value: "500+", label: "Properties Listed" },
@@ -16,19 +18,16 @@ const stats = [
 
 const categories = ["Flat", "Bungalow", "Row House", "Office", "Shop", "Warehouse", "Co-working"];
 
-const featuredProperties = [
-  { id: 1, title: "Trump Towers Pune", location: "Kalyani Nagar", price: "12.5 Cr", size: "4500 sqft", type: "4.5 BHK Flat", image: "/images/res-1.png" },
-  { id: 2, title: "Panchshil Towers", location: "Kharadi", price: "9.8 Cr", size: "3800 sqft", type: "4 BHK Flat", image: "/images/res-2.png" },
-  { id: 3, title: "Marvel Zephyr", location: "Kharadi", price: "6.5 Cr", size: "2800 sqft", type: "3 BHK Flat", image: "/images/res-3.png" },
-  { id: 4, title: "Yoo Pune", location: "Wagholi", price: "15.0 Cr", size: "5200 sqft", type: "5 BHK Flat", image: "/images/res-4.png" },
-  { id: 5, title: "Lodha Belmondo", location: "Pune", price: "4.2 Cr", size: "2100 sqft", type: "3 BHK Flat", image: "/images/prop-5.png" },
-  { id: 6, title: "Godrej Elements", location: "Hinjewadi", price: "2.8 Cr", size: "1500 sqft", type: "2 BHK Flat", image: "/images/prop-6.png" },
-];
-
 export default function Home() {
   const [, setLocation] = useLocation();
   const [searchVal, setSearchVal] = useState("");
   const [activeTab, setActiveTab] = useState("buy");
+
+  // Featured listings are managed from the admin CMS (mark a property as "Featured").
+  const { data: featuredProperties = [] } = useQuery({
+    queryKey: ["properties", "featured"],
+    queryFn: () => fetchProperties({ featured: true }),
+  });
 
   const handleSearch = () => {
     if (activeTab === "sell") {
@@ -182,33 +181,42 @@ export default function Home() {
             </Button>
           </div>
 
-          <div className="flex overflow-x-auto pb-8 gap-6 snap-x snap-mandatory scrollbar-hide">
-            {featuredProperties.map((property) => (
-              <div key={property.id} className="min-w-[320px] md:min-w-[380px] snap-start shrink-0 bg-white border border-border rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-shadow group cursor-pointer">
-                <div className="relative h-[240px] overflow-hidden">
-                  <img 
-                    src={property.image} 
-                    alt={property.title} 
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-foreground px-3 py-1 text-xs font-bold rounded-md">
-                    {property.type}
+          {featuredProperties.length === 0 ? (
+            <div className="text-center py-16 text-muted-foreground border border-dashed border-border rounded-xl">
+              <p className="font-medium">No featured properties yet</p>
+              <p className="text-sm mt-1">Featured listings marked in the admin panel will appear here.</p>
+            </div>
+          ) : (
+            <div className="flex overflow-x-auto pb-8 gap-6 snap-x snap-mandatory scrollbar-hide">
+              {featuredProperties.map((property) => (
+                <div key={property.id} className="min-w-[320px] md:min-w-[380px] snap-start shrink-0 bg-white border border-border rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-shadow group cursor-pointer">
+                  <div className="relative h-[240px] overflow-hidden">
+                    <img
+                      src={primaryImage(property)}
+                      alt={property.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-foreground px-3 py-1 text-xs font-bold rounded-md">
+                      {property.bhk ? `${property.bhk} BHK ` : ""}{categoryLabel(property.category)}
+                    </div>
+                  </div>
+                  <div className="p-5">
+                    <h3 className="text-2xl font-bold text-primary mb-1">{property.price}</h3>
+                    <h4 className="text-lg font-serif font-semibold text-foreground truncate">{property.title}</h4>
+                    <div className="flex items-center gap-2 text-muted-foreground text-sm mt-2 mb-4">
+                      <MapPin size={14} /> {property.location}
+                    </div>
+                    <div className="flex items-center justify-between pt-4 border-t border-border">
+                      <span className="text-sm font-medium text-muted-foreground">{areaLabel(property)}</span>
+                      <Button asChild size="sm" className="bg-primary text-white hover:bg-primary/90">
+                        <Link href="/contact">Contact Agent</Link>
+                      </Button>
+                    </div>
                   </div>
                 </div>
-                <div className="p-5">
-                  <h3 className="text-2xl font-bold text-primary mb-1">{property.price}</h3>
-                  <h4 className="text-lg font-serif font-semibold text-foreground truncate">{property.title}</h4>
-                  <div className="flex items-center gap-2 text-muted-foreground text-sm mt-2 mb-4">
-                    <MapPin size={14} /> {property.location}
-                  </div>
-                  <div className="flex items-center justify-between pt-4 border-t border-border">
-                    <span className="text-sm font-medium text-muted-foreground">{property.size}</span>
-                    <Button size="sm" className="bg-primary text-white hover:bg-primary/90">Contact Agent</Button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
           
           <Button variant="outline" asChild className="w-full mt-4 md:hidden border-primary text-primary">
             <Link href="/residential">View All Properties</Link>

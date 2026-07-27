@@ -5,7 +5,10 @@ import { requireAdmin, type AdminRequest } from "../../middlewares/adminAuth";
 
 const router: IRouter = Router();
 
-router.use(requireAdmin);
+// Scope auth to /admin/* only. Without the path prefix this middleware would
+// run for every request (these routers are mounted at the root), which would
+// incorrectly block the public property endpoints.
+router.use("/admin", requireAdmin);
 
 router.get("/admin/properties", async (req, res): Promise<void> => {
   req.log.info("Admin: listing properties");

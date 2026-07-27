@@ -1,24 +1,42 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "wouter";
-import { ChevronRight, MapPin, SlidersHorizontal, Heart, PhoneCall } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { ChevronRight, MapPin, SlidersHorizontal, PhoneCall, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { fetchProperties, primaryImage, areaLabel, categoryLabel } from "@/lib/api";
+import type { Property } from "@/lib/types";
 
-const properties = [
-  { id: 1, title: "Grade A Logistics Warehouse", location: "Chakan, Pune", price: "8.5 L/mo", size: "40,000 sqft", type: "Warehouse", image: "/images/ind-1.png", status: "Available" },
-  { id: 2, title: "Industrial Factory Shed", location: "Ranjangaon, Pune", price: "2.5 Cr", size: "15,000 sqft", type: "Factory/Shed", image: "/images/ind-2.png", status: "Available" },
-  { id: 3, title: "Cold Storage Facility", location: "Talegaon, Pune", price: "12.0 Cr", size: "25,000 sqft", type: "Cold Storage", image: "/images/ind-3.png", status: "Available" },
-  { id: 4, title: "NA Industrial Plot", location: "Bhosari, Pune", price: "5.5 Cr", size: "2 Acres", type: "Industrial Plot", image: "/images/ind-4.png", status: "Available" },
-  { id: 5, title: "E-commerce Fulfilment Center", location: "Chakan, Pune", price: "15.0 L/mo", size: "80,000 sqft", type: "Warehouse", image: "/images/ind-1.png", status: "Available" },
-  { id: 6, title: "Manufacturing Unit Setup", location: "Sanaswadi, Pune", price: "18.5 Cr", size: "45,000 sqft", type: "Factory/Shed", image: "/images/ind-2.png", status: "Under Construction" },
-  { id: 7, title: "Food Processing Unit", location: "Shirwal, Pune", price: "4.2 L/mo", size: "20,000 sqft", type: "Cold Storage", image: "/images/ind-3.png", status: "Available" },
-  { id: 8, title: "MIDC Allotted Land", location: "Baramati, Pune", price: "8.0 Cr", size: "5 Acres", type: "Industrial Plot", image: "/images/ind-4.png", status: "Available" },
-];
+const TYPE_OPTIONS = ["warehouse", "factory", "industrial-plot", "cold-storage"];
+const HUBS = ["Chakan", "Ranjangaon", "Bhosari", "Talegaon", "Sanaswadi", "Baramati"];
 
 export default function Industrial() {
+  const [transaction, setTransaction] = useState<"buy" | "rent">("buy");
+  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+  const [selectedHubs, setSelectedHubs] = useState<string[]>([]);
+  const [appliedFilters, setAppliedFilters] = useState(0);
+
+  const { data: properties = [], isLoading, isError } = useQuery({
+    queryKey: ["properties", "industrial", transaction],
+    queryFn: () => fetchProperties({ type: "industrial", transactionType: transaction }),
+  });
+
+  function toggle<T>(list: T[], value: T, setter: (v: T[]) => void) {
+    setter(list.includes(value) ? list.filter((v) => v !== value) : [...list, value]);
+  }
+
+  const filtered = useMemo(() => {
+    void appliedFilters;
+    return properties.filter((p) => {
+      if (selectedTypes.length && !selectedTypes.includes(p.category)) return false;
+      if (selectedHubs.length && !selectedHubs.some((l) => p.location.toLowerCase().includes(l.toLowerCase()))) return false;
+      return true;
+    });
+  }, [properties, selectedTypes, selectedHubs, appliedFilters]);
+
   return (
     <div className="bg-secondary/20 min-h-screen pb-20">
       <div className="bg-white border-b pt-4 pb-6">
@@ -31,9 +49,11 @@ export default function Industrial() {
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
               <h1 className="text-2xl md:text-3xl font-serif font-bold text-foreground">Industrial & Warehousing</h1>
-              <p className="text-muted-foreground text-sm mt-1">Showing 8 Industrial Properties in Pune</p>
+              <p className="text-muted-foreground text-sm mt-1">
+                {isLoading ? "Loading properties…" : `Showing ${filtered.length} Industrial ${filtered.length === 1 ? "Property" : "Properties"} in Pune`}
+              </p>
             </div>
-            <Tabs defaultValue="buy" className="w-[200px]">
+            <Tabs value={transaction} onValueChange={(v) => setTransaction(v as "buy" | "rent")} className="w-[200px]">
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="buy">Buy</TabsTrigger>
                 <TabsTrigger value="rent">Rent</TabsTrigger>
@@ -56,10 +76,10 @@ export default function Industrial() {
               <div className="mb-6">
                 <h3 className="font-semibold text-foreground mb-3 text-sm">Property Type</h3>
                 <div className="space-y-2.5">
-                  {["Warehouse", "Factory / Shed", "Industrial Plot", "Cold Storage", "Built-to-Suit"].map((type) => (
+                  {TYPE_OPTIONS.map((type) => (
                     <div key={type} className="flex items-center space-x-2">
-                      <Checkbox id={`type-${type}`} />
-                      <Label htmlFor={`type-${type}`} className="text-sm font-normal cursor-pointer">{type}</Label>
+                      <Checkbox id={`type-${type}`} checked={selectedTypes.includes(type)} onCheckedChange={() => toggle(selectedTypes, type, setSelectedTypes)} />
+                      <Label htmlFor={`type-${type}`} className="text-sm font-normal cursor-pointer">{categoryLabel(type)}</Label>
                     </div>
                   ))}
                 </div>
@@ -68,77 +88,94 @@ export default function Industrial() {
               <div className="mb-6">
                 <h3 className="font-semibold text-foreground mb-3 text-sm">Industrial Hubs</h3>
                 <div className="space-y-2.5">
-                  {["Chakan MIDC", "Ranjangaon", "Bhosari", "Talegaon", "Sanaswadi", "Baramati"].map((loc) => (
+                  {HUBS.map((loc) => (
                     <div key={loc} className="flex items-center space-x-2">
-                      <Checkbox id={`loc-${loc}`} />
+                      <Checkbox id={`loc-${loc}`} checked={selectedHubs.includes(loc)} onCheckedChange={() => toggle(selectedHubs, loc, setSelectedHubs)} />
                       <Label htmlFor={`loc-${loc}`} className="text-sm font-normal cursor-pointer">{loc}</Label>
                     </div>
                   ))}
                 </div>
               </div>
-
-              <div className="mb-6">
-                <h3 className="font-semibold text-foreground mb-3 text-sm">Area</h3>
-                <div className="space-y-2.5">
-                  {["Up to 10,000 sqft", "10,000 - 50,000 sqft", "50,000 - 1 Lakh sqft", "1 Lakh+ sqft", "Plots in Acres"].map((area) => (
-                    <div key={area} className="flex items-center space-x-2">
-                      <Checkbox id={`area-${area}`} />
-                      <Label htmlFor={`area-${area}`} className="text-sm font-normal cursor-pointer">{area}</Label>
-                    </div>
-                  ))}
-                </div>
-              </div>
               
-              <Button className="w-full mt-4 bg-primary hover:bg-primary/90 text-white">Apply Filters</Button>
+              <Button
+                className="w-full mt-4 bg-primary hover:bg-primary/90 text-white"
+                onClick={() => setAppliedFilters((n) => n + 1)}
+              >
+                Apply Filters
+              </Button>
             </div>
           </aside>
 
           {/* Right Property Grid */}
           <div className="flex-1">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {properties.map((property) => (
-                <div key={property.id} className="bg-white border border-border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow group flex flex-col sm:flex-row">
-                  <div className="relative h-[240px] sm:h-auto sm:w-[220px] shrink-0 overflow-hidden">
-                    <img 
-                      src={property.image} 
-                      alt={property.title} 
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <Badge className="absolute top-3 left-3 bg-white/90 text-foreground hover:bg-white/90 font-bold backdrop-blur-sm shadow-sm">
-                      {property.type}
-                    </Badge>
-                  </div>
-                  
-                  <div className="p-5 flex flex-col flex-grow">
-                    <h4 className="text-xl font-serif font-bold text-foreground leading-tight mb-2">{property.title}</h4>
-                    <p className="text-muted-foreground text-sm flex items-center gap-1 mb-4">
-                      <MapPin size={14} className="shrink-0" /> <span className="truncate">{property.location}</span>
-                    </p>
-                    
-                    <div className="bg-secondary/50 p-3 rounded-md mb-auto">
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-sm text-muted-foreground">Price</span>
-                        <span className="font-bold text-lg text-primary">{property.price}</span>
-                      </div>
-                      <div className="flex justify-between items-center border-t pt-2">
-                        <span className="text-sm text-muted-foreground">Area</span>
-                        <span className="font-semibold text-sm">{property.size}</span>
-                      </div>
-                    </div>
-                    
-                    <div className="flex gap-2 mt-4 pt-4 border-t">
-                      <Button variant="outline" className="flex-1 text-primary border-primary hover:bg-primary hover:text-white h-10 text-sm">
-                        View Details
-                      </Button>
-                      <Button className="flex-1 bg-primary hover:bg-primary/90 text-white h-10 text-sm">
-                        <PhoneCall size={16} className="mr-2" /> Contact
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+            {isLoading ? (
+              <div className="flex items-center justify-center h-64">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+              </div>
+            ) : isError ? (
+              <div className="text-center py-20 text-muted-foreground">
+                <Building2 size={40} className="mx-auto mb-3 opacity-30" />
+                <p className="font-medium">Couldn't load properties</p>
+                <p className="text-sm mt-1">Please try again in a moment.</p>
+              </div>
+            ) : filtered.length === 0 ? (
+              <div className="text-center py-20 text-muted-foreground">
+                <Building2 size={40} className="mx-auto mb-3 opacity-30" />
+                <p className="font-medium">No industrial properties match your filters</p>
+                <p className="text-sm mt-1">Try widening your search criteria.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {filtered.map((property) => (
+                  <IndustrialCard key={property.id} property={property} />
+                ))}
+              </div>
+            )}
           </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function IndustrialCard({ property }: { property: Property }) {
+  return (
+    <div className="bg-white border border-border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow group flex flex-col sm:flex-row">
+      <div className="relative h-[240px] sm:h-auto sm:w-[220px] shrink-0 overflow-hidden">
+        <img
+          src={primaryImage(property)}
+          alt={property.title}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        />
+        <Badge className="absolute top-3 left-3 bg-white/90 text-foreground hover:bg-white/90 font-bold backdrop-blur-sm shadow-sm">
+          {categoryLabel(property.category)}
+        </Badge>
+      </div>
+
+      <div className="p-5 flex flex-col flex-grow">
+        <h4 className="text-xl font-serif font-bold text-foreground leading-tight mb-2">{property.title}</h4>
+        <p className="text-muted-foreground text-sm flex items-center gap-1 mb-4">
+          <MapPin size={14} className="shrink-0" /> <span className="truncate">{property.location}</span>
+        </p>
+
+        <div className="bg-secondary/50 p-3 rounded-md mb-auto">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-sm text-muted-foreground">Price</span>
+            <span className="font-bold text-lg text-primary">{property.price}</span>
+          </div>
+          <div className="flex justify-between items-center border-t pt-2">
+            <span className="text-sm text-muted-foreground">Area</span>
+            <span className="font-semibold text-sm">{areaLabel(property)}</span>
+          </div>
+        </div>
+
+        <div className="flex gap-2 mt-4 pt-4 border-t">
+          <Button variant="outline" className="flex-1 text-primary border-primary hover:bg-primary hover:text-white h-10 text-sm">
+            View Details
+          </Button>
+          <Button asChild className="flex-1 bg-primary hover:bg-primary/90 text-white h-10 text-sm">
+            <Link href="/contact?interest=industrial"><PhoneCall size={16} className="mr-2" /> Contact</Link>
+          </Button>
         </div>
       </div>
     </div>

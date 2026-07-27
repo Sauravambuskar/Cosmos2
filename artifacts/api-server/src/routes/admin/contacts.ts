@@ -5,7 +5,8 @@ import { requireAdmin } from "../../middlewares/adminAuth";
 
 const router: IRouter = Router();
 
-router.use(requireAdmin);
+// Scope auth to /admin/* only (routers are mounted at the root).
+router.use("/admin", requireAdmin);
 
 router.get("/admin/contacts", async (req, res): Promise<void> => {
   req.log.info("Admin: listing contacts");

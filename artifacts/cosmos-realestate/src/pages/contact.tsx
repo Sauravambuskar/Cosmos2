@@ -7,21 +7,57 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { submitContact } from "@/lib/api";
+
+// Map the detailed UI interest options to the CMS interest buckets.
+function mapInterest(value: string): string {
+  if (value.includes("commercial")) return "commercial";
+  if (value === "industrial") return "industrial";
+  if (value.includes("residential")) return "residential";
+  return "general";
+}
 
 export default function Contact() {
   const { toast } = useToast();
-  
+
   // Parse interest from query parameter if present
   const params = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
   const interestParam = params.get("interest") || "buy_residential";
   const [interest, setInterest] = useState(interestParam);
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    toast({
-      title: "Message Sent",
-      description: "Thank you for reaching out. Our team will get back to you shortly.",
-    });
+    const formEl = e.currentTarget;
+    const data = new FormData(formEl);
+    const name = String(data.get("name") ?? "").trim();
+    const email = String(data.get("email") ?? "").trim();
+    const phone = String(data.get("phone") ?? "").trim();
+    const message = String(data.get("message") ?? "").trim();
+
+    setSubmitting(true);
+    try {
+      await submitContact({
+        name,
+        email,
+        phone,
+        message,
+        interest: mapInterest(interest),
+      });
+      toast({
+        title: "Message Sent",
+        description: "Thank you for reaching out. Our team will get back to you shortly.",
+      });
+      formEl.reset();
+    } catch (err) {
+      toast({
+        title: "Something went wrong",
+        description: err instanceof Error ? err.message : "Please try again in a moment.",
+        variant: "destructive",
+      });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -50,18 +86,18 @@ export default function Contact() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label htmlFor="name" className="text-sm font-medium text-foreground">Full Name *</label>
-                  <Input id="name" placeholder="John Doe" className="h-12 bg-secondary/30 focus-visible:ring-primary" required />
+                  <Input id="name" name="name" placeholder="John Doe" className="h-12 bg-secondary/30 focus-visible:ring-primary" required />
                 </div>
                 <div className="space-y-2">
                   <label htmlFor="email" className="text-sm font-medium text-foreground">Email Address *</label>
-                  <Input id="email" type="email" placeholder="john@example.com" className="h-12 bg-secondary/30 focus-visible:ring-primary" required />
+                  <Input id="email" name="email" type="email" placeholder="john@example.com" className="h-12 bg-secondary/30 focus-visible:ring-primary" required />
                 </div>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label htmlFor="phone" className="text-sm font-medium text-foreground">Phone Number *</label>
-                  <Input id="phone" type="tel" placeholder="+91 90000 00000" className="h-12 bg-secondary/30 focus-visible:ring-primary" required />
+                  <Input id="phone" name="phone" type="tel" placeholder="+91 90000 00000" className="h-12 bg-secondary/30 focus-visible:ring-primary" required />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-foreground">I am interested in *</label>
@@ -85,13 +121,14 @@ export default function Contact() {
                 <label htmlFor="message" className="text-sm font-medium text-foreground">Your Message / Requirements</label>
                 <Textarea 
                   id="message" 
+                  name="message"
                   placeholder="Tell us about the locality, budget, and specific requirements..." 
                   className="min-h-[150px] bg-secondary/30 focus-visible:ring-primary resize-none"
                 />
               </div>
 
-              <Button type="submit" className="w-full md:w-auto px-10 h-12 bg-primary hover:bg-primary/90 text-white font-bold text-base">
-                Submit Inquiry
+              <Button type="submit" disabled={submitting} className="w-full md:w-auto px-10 h-12 bg-primary hover:bg-primary/90 text-white font-bold text-base disabled:opacity-60">
+                {submitting ? "Submitting…" : "Submit Inquiry"}
               </Button>
             </form>
           </div>

@@ -1,5 +1,10 @@
-import app from "./app";
-import { logger } from "./lib/logger";
+import { loadEnv } from "./lib/loadEnv";
+
+// Load local .env before anything reads process.env (no-op in production).
+loadEnv();
+
+const { default: app } = await import("./app");
+const { logger } = await import("./lib/logger");
 
 const rawPort = process.env["PORT"];
 
