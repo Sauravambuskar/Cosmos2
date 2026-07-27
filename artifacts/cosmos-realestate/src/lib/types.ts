@@ -26,5 +26,8 @@ export interface Contact {
   phone: string;
   message: string;
   interest: string;
+  leadStatus: string; // new | contacted | qualified | closed
+  notes: string;
+  readAt: string | null;
   createdAt: string;
 }

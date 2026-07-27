@@ -8,7 +8,7 @@ import type { Property, Contact } from "@/lib/types";
 export default function AdminDashboard() {
   const [, setLocation] = useLocation();
   const [properties, setProperties] = useState<Property[]>([]);
-  const [contacts, setContacts] = useState<Contact[]>([]);
+  const [contacts, setContacts] = useState<Contact[]>([] as Contact[]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -31,6 +31,7 @@ export default function AdminDashboard() {
     load();
   }, [setLocation]);
 
+  const newLeads = contacts.filter((c) => c.leadStatus === "new").length;
   const stats = [
     {
       label: "Total Properties",
@@ -47,11 +48,11 @@ export default function AdminDashboard() {
       sub: "highlighted on homepage",
     },
     {
-      label: "Enquiries",
-      value: contacts.length,
+      label: "New Leads",
+      value: newLeads,
       icon: MessageSquare,
-      color: "bg-green-500",
-      sub: "total contact submissions",
+      color: newLeads > 0 ? "bg-red-500" : "bg-green-500",
+      sub: `${contacts.length} total enquiries`,
     },
     {
       label: "For Rent",
