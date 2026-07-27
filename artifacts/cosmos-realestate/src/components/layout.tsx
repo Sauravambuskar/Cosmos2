@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, MapPin, Phone, Mail, ChevronRight, ChevronDown } from "lucide-react";
+import { Menu, X, MapPin, Phone, Mail, Globe, ChevronRight, ChevronDown } from "lucide-react";
 import { SiWhatsapp } from "react-icons/si";
 import { Button } from "@/components/ui/button";
 
@@ -299,6 +299,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 <li className="flex items-center gap-3">
                   <Mail className="text-primary shrink-0" size={18} />
                   <span>jatin@cosmosrealestate.in</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <Globe className="text-primary shrink-0" size={18} />
+                  <a href="https://www.cosmosrealestate.co.in/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">www.cosmosrealestate.co.in</a>
                 </li>
               </ul>
             </div>
