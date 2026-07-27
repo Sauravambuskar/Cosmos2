@@ -1,4 +1,4 @@
-import type { Property } from "./types";
+import type { Property, Project } from "./types";
 
 export interface PropertyQuery {
   type?: string; // residential | commercial | industrial
@@ -84,4 +84,36 @@ export function categoryLabel(category: string): string {
   return category
     .replace(/-/g, " ")
     .replace(/\b\w/g, (l) => l.toUpperCase());
+}
+
+// ---------------------------------------------------------------------------
+// Projects API
+// ---------------------------------------------------------------------------
+
+export interface ProjectQuery {
+  type?: string;
+  status?: string;
+  featured?: boolean;
+}
+
+export async function fetchProjects(query: ProjectQuery = {}): Promise<Project[]> {
+  const params = new URLSearchParams();
+  if (query.type) params.append("type", query.type);
+  if (query.status) params.append("status", query.status);
+  if (query.featured) params.append("featured", "true");
+
+  const qs = params.toString();
+  const res = await fetch(`/api/projects${qs ? `?${qs}` : ""}`);
+  if (!res.ok) {
+    throw new Error(`Failed to load projects (${res.status})`);
+  }
+  return (await res.json()) as Project[];
+}
+
+export async function fetchProject(id: number): Promise<Project> {
+  const res = await fetch(`/api/projects/${id}`);
+  if (!res.ok) {
+    throw new Error(`Failed to load project (${res.status})`);
+  }
+  return (await res.json()) as Project;
 }

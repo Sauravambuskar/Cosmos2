@@ -19,6 +19,31 @@ export interface Property {
   updatedAt: string;
 }
 
+export interface Project {
+  id: number;
+  name: string;
+  description: string;
+  location: string;
+  type: string;
+  status: string;
+  units: string;
+  highlights: string;
+  image: string;
+  brochureUrl: string;
+  videoUrl: string;
+  area: string;
+  amenities: string[];
+  gallery: string[];
+  rera: string;
+  possession: string;
+  priceRange: string;
+  developer: string;
+  featured: boolean;
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Contact {
   id: number;
   name: string;
@@ -26,7 +51,7 @@ export interface Contact {
   phone: string;
   message: string;
   interest: string;
-  leadStatus: string; // new | contacted | qualified | closed
+  leadStatus: string;
   notes: string;
   readAt: string | null;
   createdAt: string;

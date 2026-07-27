@@ -1,11 +1,13 @@
 import { useRef, useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link } from "wouter";
+import { useQuery } from "@tanstack/react-query";
 import { MapPin, Building, ChevronRight, Download, CheckCircle, Play, Pause, Clock, Ruler, Award, Factory } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { fetchProjects } from "@/lib/api";
 
-const projects = [
+const fallbackProjects = [
   { id: 1, name: "Cosmos Grandeur", location: "Koregaon Park, Pune", type: "Residential", status: "Completed", units: "42 Exclusive Units", highlights: "Private Pools, Home Automation", image: "/images/proj-1.png" },
   { id: 2, name: "Cosmos Business Hub", location: "Baner, Pune", type: "Commercial", status: "Ongoing", units: "120 Office Spaces", highlights: "LEED Certified, Smart Parking", image: "/images/com-2.png" },
   { id: 3, name: "Cosmos Logistics Park", location: "Chakan, Pune", type: "Industrial", status: "Upcoming", units: "5 Million SqFt", highlights: "Grade-A Warehousing", image: "/images/ind-2.png" },
@@ -94,6 +96,18 @@ function VimeoEmbed() {
 }
 
 export default function Projects() {
+  const { data: apiProjects, isLoading } = useQuery({
+    queryKey: ["projects"],
+    queryFn: () => fetchProjects(),
+    staleTime: 30_000, // Refetch every 30s for near-real-time sync
+    refetchInterval: 30_000,
+  });
+
+  // Use API data if available, otherwise show fallback
+  const projects = apiProjects && apiProjects.length > 0
+    ? apiProjects.map((p) => ({ id: p.id, name: p.name, location: p.location, type: p.type, status: p.status, units: p.units, highlights: p.highlights, image: p.image || "/images/proj-1.png", brochureUrl: p.brochureUrl }))
+    : fallbackProjects.map((p) => ({ ...p, brochureUrl: "" }));
+
   return (
     <div className="bg-secondary/20 min-h-screen pb-20">
 
@@ -351,12 +365,22 @@ export default function Projects() {
                 </div>
 
                 <div className="flex gap-2">
-                  <Button variant="outline" className="flex-1 text-primary border-primary hover:bg-primary hover:text-white h-10">
-                    View
+                  <Button asChild variant="outline" className="flex-1 text-primary border-primary hover:bg-primary hover:text-white h-10">
+                    <Link href={`/projects/${project.id}`}>View</Link>
                   </Button>
-                  <Button className="flex-1 bg-primary text-white hover:bg-primary/90 h-10">
-                    <Download size={16} className="mr-2" /> Brochure
-                  </Button>
+                  {project.brochureUrl ? (
+                    <Button asChild className="flex-1 bg-primary text-white hover:bg-primary/90 h-10">
+                      <a href={project.brochureUrl} target="_blank" rel="noopener noreferrer">
+                        <Download size={16} className="mr-2" /> Brochure
+                      </a>
+                    </Button>
+                  ) : (
+                    <Button asChild className="flex-1 bg-primary text-white hover:bg-primary/90 h-10">
+                      <Link href={`/projects/${project.id}`}>
+                        <Download size={16} className="mr-2" /> Brochure
+                      </Link>
+                    </Button>
+                  )}
                 </div>
               </div>
             </motion.div>

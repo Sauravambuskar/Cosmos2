@@ -8,12 +8,14 @@ import {
   Menu,
   X,
   Home,
+  FolderKanban,
 } from "lucide-react";
 import { clearAdminToken } from "@/lib/adminAuth";
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/properties", label: "Properties", icon: Building2 },
+  { href: "/admin/projects", label: "Projects", icon: FolderKanban },
   { href: "/admin/contacts", label: "Contacts", icon: MessageSquare },
 ];
 

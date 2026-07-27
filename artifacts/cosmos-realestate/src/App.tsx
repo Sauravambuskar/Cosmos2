@@ -10,11 +10,14 @@ import Residential from "@/pages/residential";
 import Commercial from "@/pages/commercial";
 import Industrial from "@/pages/industrial";
 import Projects from "@/pages/projects";
+import ProjectDetail from "@/pages/project-detail";
 import Contact from "@/pages/contact";
 import AdminLogin from "@/pages/admin/login";
 import AdminDashboard from "@/pages/admin/dashboard";
 import AdminProperties from "@/pages/admin/properties";
 import PropertyForm from "@/pages/admin/property-form";
+import AdminProjects from "@/pages/admin/projects";
+import ProjectFormAdmin from "@/pages/admin/project-form";
 import AdminContacts from "@/pages/admin/contacts";
 
 const queryClient = new QueryClient();
@@ -30,6 +33,9 @@ function App() {
             <Route path="/admin/properties/new" component={PropertyForm} />
             <Route path="/admin/properties/:id/edit" component={PropertyForm} />
             <Route path="/admin/properties" component={AdminProperties} />
+            <Route path="/admin/projects/new" component={ProjectFormAdmin} />
+            <Route path="/admin/projects/:id/edit" component={ProjectFormAdmin} />
+            <Route path="/admin/projects" component={AdminProjects} />
             <Route path="/admin/contacts" component={AdminContacts} />
             <Route path="/admin" component={AdminDashboard} />
 
@@ -43,6 +49,7 @@ function App() {
                     <Route path="/residential" component={Residential} />
                     <Route path="/commercial" component={Commercial} />
                     <Route path="/industrial" component={Industrial} />
+                    <Route path="/projects/:id" component={ProjectDetail} />
                     <Route path="/projects" component={Projects} />
                     <Route path="/contact" component={Contact} />
                     <Route component={NotFound} />
