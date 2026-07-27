@@ -290,7 +290,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               <ul className="space-y-4 text-white/70 text-sm">
                 <li className="flex items-start gap-3">
                   <MapPin className="text-primary shrink-0 mt-0.5" size={18} />
-                  <span>No.2, "H" Building, Ground Floor, Liberty-II, Opp. Pizza Hut, North Main Road, Koregaon Park, Pune - 411001</span>
+                  <span>Shop No B4, Upper Ground, Fifth Avenue, Dholepatil Road, Pune - 411001</span>
                 </li>
                 <li className="flex items-center gap-3">
                   <Phone className="text-primary shrink-0" size={18} />

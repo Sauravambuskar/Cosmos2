@@ -146,7 +146,7 @@ export default function Contact() {
                   <div>
                     <h4 className="font-bold text-sm mb-1 text-foreground">Office Address</h4>
                     <p className="text-muted-foreground text-sm leading-relaxed">
-                      No.2, "H" Building, Ground Floor, Liberty-II, Opp. Pizza Hut, North Main Road, Koregaon Park, Pune - 411001
+                      Shop No B4, Upper Ground, Fifth Avenue, Dholepatil Road, Pune - 411001
                     </p>
                   </div>
                 </div>
@@ -195,10 +195,10 @@ export default function Contact() {
             
             {/* Map Placeholder */}
             <div className="h-48 bg-muted rounded-xl border border-border w-full flex items-center justify-center relative overflow-hidden shadow-sm">
-                <img src={`https://placehold.co/600x400/e2e8f0/64748b?text=Map:+Koregaon+Park,+Pune`} alt="Map of Koregaon Park" className="w-full h-full object-cover opacity-70" />
+                <img src={`https://placehold.co/600x400/e2e8f0/64748b?text=Map:+Dholepatil+Road,+Pune`} alt="Map of Dholepatil Road" className="w-full h-full object-cover opacity-70" />
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-foreground font-semibold font-serif">
                   <MapPin size={28} className="text-primary mb-2 drop-shadow-md" />
-                  <span className="bg-white/90 px-3 py-1 rounded text-sm shadow-sm">Koregaon Park, Pune</span>
+                  <span className="bg-white/90 px-3 py-1 rounded text-sm shadow-sm">Dholepatil Road, Pune</span>
                 </div>
             </div>
           </div>
