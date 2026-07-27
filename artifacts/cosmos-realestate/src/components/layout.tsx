@@ -294,7 +294,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 </li>
                 <li className="flex items-center gap-3">
                   <Phone className="text-primary shrink-0" size={18} />
-                  <span>+91-9325097835 / +91-9823056983</span>
+                  <span>+91-9823056983</span>
                 </li>
                 <li className="flex items-center gap-3">
                   <Mail className="text-primary shrink-0" size={18} />
@@ -312,7 +312,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       </footer>
 
       <a
-        href="https://wa.me/919325097835"
+        href="https://wa.me/919823056983"
         target="_blank"
         rel="noopener noreferrer"
         className="fixed bottom-6 right-6 z-50 bg-[#25D366] text-white p-4 rounded-full shadow-xl hover:scale-105 transition-transform group flex items-center justify-center animate-pulse-slow"
