@@ -158,7 +158,6 @@ export default function Contact() {
                   <div>
                     <h4 className="font-bold text-sm mb-1 text-foreground">Phone & WhatsApp</h4>
                     <p className="text-muted-foreground text-sm mb-1">+91 9325097835</p>
-                    <p className="text-muted-foreground text-sm">+91 20 26152956 (Tele/Fax)</p>
                   </div>
                 </div>
 
