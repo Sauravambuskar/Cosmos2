@@ -5,6 +5,48 @@ import { MapPin, ChevronRight, Building, CheckCircle, Download, Calendar, Ruler,
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { fetchProject } from "@/lib/api";
+import type { Project } from "@/lib/types";
+
+// Fallback project data — mirrors the listing page so "View" always works
+const fallbackProjects: Partial<Project>[] = [
+  { id: 1, name: "Cosmos Grandeur", location: "Koregaon Park, Pune", type: "Residential", status: "Completed", units: "42 Exclusive Units", highlights: "Private Pools, Home Automation, Italian Marble Flooring, Smart Home System", image: "/images/proj-1.png", description: "An ultra-luxury residential development in Pune's most coveted neighborhood. Cosmos Grandeur features 42 exclusive units with private pools, state-of-the-art home automation, Italian marble flooring, and panoramic views of Koregaon Park.", amenities: ["Private Pool", "Home Automation", "Italian Marble Flooring", "24/7 Concierge", "Landscaped Gardens", "Clubhouse", "Gym & Spa", "Underground Parking"], area: "4,500 - 6,200 sq.ft.", possession: "Delivered", priceRange: "3.5 Cr - 8.5 Cr", developer: "Cosmos Real Estate" },
+  { id: 2, name: "Cosmos Business Hub", location: "Baner, Pune", type: "Commercial", status: "Ongoing", units: "120 Office Spaces", highlights: "LEED Certified, Smart Parking, High-Speed Elevators, Food Court", image: "/images/com-2.png", description: "A LEED-certified commercial development offering 120 premium office spaces in the heart of Baner's IT corridor. Designed for modern businesses with smart parking, high-speed elevators, a food court, and conference facilities.", amenities: ["LEED Certified", "Smart Parking", "High-Speed Elevators", "Food Court", "Conference Rooms", "Power Backup", "Fire Safety", "24/7 Security"], area: "500 - 5,000 sq.ft.", possession: "December 2025", priceRange: "85 L - 5.5 Cr", developer: "Cosmos Real Estate" },
+  { id: 3, name: "Cosmos Logistics Park", location: "Chakan, Pune", type: "Industrial", status: "Upcoming", units: "5 Million SqFt", highlights: "Grade-A Warehousing, 24/7 Security, Truck Parking, Fire Safety Systems", image: "/images/ind-2.png", description: "A massive Grade-A logistics and warehousing park spread over 100 acres at Chakan, Pune's premier industrial corridor. Offering 5 million sq.ft. of warehousing with world-class infrastructure, 24/7 security, ample truck parking, and advanced fire safety systems.", amenities: ["Grade-A Warehouse", "24/7 Security", "Truck Parking", "Fire Safety", "Power Backup", "ETP & STP", "Canteen", "Driver Rest Rooms"], area: "50,000 - 5,00,000 sq.ft.", possession: "Phase 1: March 2026", priceRange: "On Request", developer: "Cosmos Real Estate" },
+  { id: 4, name: "Cosmos Heights", location: "Kalyani Nagar, Pune", type: "Residential", status: "Completed", units: "80 Premium Flats", highlights: "Clubhouse, Infinity Pool, Gymnasium, Children's Play Area", image: "/images/res-1.png", description: "Premium residential tower in the heart of Kalyani Nagar offering 80 thoughtfully designed flats with world-class amenities including an infinity pool, modern clubhouse, and lush landscaping.", amenities: ["Infinity Pool", "Clubhouse", "Gymnasium", "Children's Play Area", "Jogging Track", "Indoor Games", "Party Hall", "Visitor Parking"], area: "1,200 - 2,800 sq.ft.", possession: "Delivered", priceRange: "1.2 Cr - 3.5 Cr", developer: "Cosmos Real Estate" },
+  { id: 5, name: "Cosmos Retail Square", location: "Viman Nagar, Pune", type: "Commercial", status: "Completed", units: "45 Retail Shops", highlights: "High Footfall, Anchor Stores, Central Atrium, Basement Parking", image: "/images/com-3.png", description: "A bustling retail destination in Viman Nagar featuring 45 premium shops, high footfall, anchor stores, and a stunning central atrium. Perfect for retail businesses looking for prime visibility.", amenities: ["High Footfall Area", "Central Atrium", "Anchor Stores", "Basement Parking", "Escalators", "Power Backup", "CCTV Surveillance", "Fire Safety"], area: "300 - 3,000 sq.ft.", possession: "Delivered", priceRange: "65 L - 4 Cr", developer: "Cosmos Real Estate" },
+  { id: 6, name: "Cosmos Villas", location: "Aundh, Pune", type: "Residential", status: "Ongoing", units: "15 Luxury Bungalows", highlights: "Gated Community, Private Gardens, Smart Homes, Premium Finishes", image: "/images/res-2.png", description: "An exclusive gated community of 15 luxury bungalows in Aundh, featuring private gardens, smart home technology, and premium European finishes. Each villa is a statement of luxury and privacy.", amenities: ["Private Garden", "Smart Home", "Gated Community", "Swimming Pool", "Clubhouse", "Tennis Court", "Jogging Path", "24/7 Security"], area: "3,500 - 5,500 sq.ft.", possession: "June 2026", priceRange: "4.5 Cr - 9 Cr", developer: "Cosmos Real Estate" },
+  { id: 7, name: "Cosmos IT Park", location: "Kharadi, Pune", type: "Commercial", status: "Upcoming", units: "2 IT Towers", highlights: "Food Court, Co-working Zones, Green Building, Sky Lounge", image: "/images/proj-2.png", description: "Twin IT towers in Kharadi's tech corridor, designed for the future of work. Features dedicated co-working zones, a food court, sky lounge, and green building certification for sustainability-conscious companies.", amenities: ["Co-working Zones", "Food Court", "Sky Lounge", "Green Building", "Smart Parking", "Gym", "Conference Center", "High-Speed Internet"], area: "1,000 - 50,000 sq.ft.", possession: "Q4 2026", priceRange: "On Request", developer: "Cosmos Real Estate" },
+  { id: 8, name: "Cosmos Riverfront", location: "Mundhwa, Pune", type: "Residential", status: "Upcoming", units: "200 Waterfront Apartments", highlights: "River Views, Jogging Track, Amphitheatre, Landscaped Promenade", image: "/images/proj-3.png", description: "A stunning riverside residential project in Mundhwa offering 200 waterfront apartments with breathtaking river views, a landscaped promenade, jogging track, and amphitheatre for community events.", amenities: ["River Views", "Jogging Track", "Amphitheatre", "Landscaped Promenade", "Swimming Pool", "Gym", "Kids Zone", "Yoga Deck"], area: "900 - 2,200 sq.ft.", possession: "Q2 2027", priceRange: "90 L - 2.8 Cr", developer: "Cosmos Real Estate" },
+];
+
+function getFallbackProject(id: number): Project | null {
+  const p = fallbackProjects.find((fp) => fp.id === id);
+  if (!p) return null;
+  return {
+    id: p.id!,
+    name: p.name || "",
+    description: p.description || "",
+    location: p.location || "",
+    type: p.type || "",
+    status: p.status || "",
+    units: p.units || "",
+    highlights: p.highlights || "",
+    image: p.image || "",
+    brochureUrl: "",
+    videoUrl: "",
+    area: p.area || "",
+    amenities: p.amenities || [],
+    gallery: [],
+    rera: "",
+    possession: p.possession || "",
+    priceRange: p.priceRange || "",
+    developer: p.developer || "",
+    featured: false,
+    active: true,
+    createdAt: "",
+    updatedAt: "",
+  } as Project;
+}
 
 export default function ProjectDetail() {
   const params = useParams<{ id: string }>();
@@ -12,8 +54,18 @@ export default function ProjectDetail() {
 
   const { data: project, isLoading, error } = useQuery({
     queryKey: ["project", projectId],
-    queryFn: () => fetchProject(projectId),
+    queryFn: async () => {
+      try {
+        return await fetchProject(projectId);
+      } catch {
+        // If API fails (e.g. no DB data), use fallback
+        const fb = getFallbackProject(projectId);
+        if (fb) return fb;
+        throw new Error("Project not found");
+      }
+    },
     enabled: !isNaN(projectId),
+    retry: false,
   });
 
   if (isLoading) {
@@ -264,8 +316,8 @@ export default function ProjectDetail() {
 
               <div className="mt-6 pt-6 border-t border-border">
                 <p className="text-xs text-muted-foreground mb-2">Call us directly</p>
-                <a href="tel:+919325097835" className="text-primary font-bold text-lg hover:underline">
-                  +91 9325097835
+                <a href="tel:+919823056983" className="text-primary font-bold text-lg hover:underline">
+                  +91 98230 56983
                 </a>
               </div>
             </motion.div>
