@@ -1,8 +1,8 @@
 import { useRef, useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { MapPin, Building, ChevronRight, Download, CheckCircle, Play, Pause, Clock, Ruler, Award, Factory } from "lucide-react";
+import { MapPin, Building, ChevronRight, Download, CheckCircle, Play, Pause, Clock, Ruler, Award, Factory, ChevronDown, Warehouse, Truck, Layers, FileText, Trees, Users, Monitor, Coffee } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { fetchProjects } from "@/lib/api";
@@ -92,6 +92,163 @@ function VimeoEmbed() {
         {isPlaying ? "Pause" : "Play"}
       </div>
     </div>
+  );
+}
+
+const malpaniShedDetails = [
+  { label: "Status", value: "Under Construction — Dry Access in August 2026", icon: Clock },
+  { label: "Size", value: "2,43,722 sq.ft.", icon: Ruler },
+  { label: "Docks", value: "19 nos.", icon: Truck },
+  { label: "Floor", value: "FM2 with 5 tonne/sqm load bearing capacity", icon: Layers },
+  { label: "Height", value: "12 mtrs clear height", icon: Warehouse },
+  { label: "Documents", value: "All statutory compliances", icon: FileText },
+];
+
+const malpaniAmenities = [
+  { label: "Business Center", desc: "with all facilities", icon: Monitor },
+  { label: "Dedicated Training Room", icon: Users },
+  { label: "Staff Room", icon: Coffee },
+  { label: "Green Zone", desc: "with Miyawaki forest", icon: Trees },
+  { label: "Drivers Rest Room", icon: Users },
+];
+
+function MalpaniShedA4Card() {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.6 }}
+      className="bg-white rounded-2xl overflow-hidden shadow-lg border border-border"
+    >
+      {/* Banner */}
+      <div className="relative h-56 md:h-72 overflow-hidden bg-foreground">
+        <img
+          src="/images/ind-1.png"
+          alt="Malpani Industrial and Logistic Park — Shed A4"
+          className="w-full h-full object-cover opacity-70"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-foreground/95 via-foreground/70 to-transparent" />
+        <div className="absolute inset-0 flex flex-col justify-end p-8">
+          <Badge className="bg-orange-500 hover:bg-orange-500 text-white w-fit mb-3 text-xs">
+            Under Construction
+          </Badge>
+          <h2 className="text-2xl md:text-3xl font-serif font-bold text-white leading-tight mb-1">
+            Malpani Industrial &amp; Logistic Park — Shed A4
+          </h2>
+          <p className="text-white/75 text-sm flex items-center gap-1.5">
+            <MapPin size={13} />
+            Ambethan, Chakan &nbsp;·&nbsp; 61 Acres &nbsp;·&nbsp; 1.45 Million SqFt Development Potential
+          </p>
+        </div>
+      </div>
+
+      {/* Summary row */}
+      <div className="p-6 md:p-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div className="bg-secondary/50 border border-border rounded-xl p-4">
+            <p className="text-muted-foreground text-xs font-medium mb-0.5">Project Size</p>
+            <p className="text-foreground font-bold text-sm">61 Acres</p>
+          </div>
+          <div className="bg-secondary/50 border border-border rounded-xl p-4">
+            <p className="text-muted-foreground text-xs font-medium mb-0.5">Total Sheds</p>
+            <p className="text-foreground font-bold text-sm">8 Sheds</p>
+          </div>
+          <div className="bg-secondary/50 border border-border rounded-xl p-4">
+            <p className="text-muted-foreground text-xs font-medium mb-0.5">Shed A4 Size</p>
+            <p className="text-foreground font-bold text-sm">2,43,722 sq.ft.</p>
+          </div>
+          <div className="bg-secondary/50 border border-border rounded-xl p-4">
+            <p className="text-muted-foreground text-xs font-medium mb-0.5">Dry Access</p>
+            <p className="text-foreground font-bold text-sm">August 2026</p>
+          </div>
+        </div>
+
+        <p className="text-foreground/75 leading-relaxed mb-6 text-[15px]">
+          <span className="font-semibold text-foreground">Shed A4</span> at Malpani Industrial &amp; Logistic Park 
+          is a <span className="font-semibold text-foreground">2,43,722 sq.ft.</span> warehouse currently under construction, 
+          available for dry access in <span className="font-semibold text-foreground">August 2026</span>. 
+          The park spans 61 acres with a total development potential of 1.45 million sq.ft. and offers 
+          Grade-A infrastructure with world-class amenities.
+        </p>
+
+        {/* Expand / Collapse toggle */}
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="flex items-center gap-2 text-primary font-semibold text-sm hover:underline transition-colors mb-2"
+        >
+          {expanded ? "Hide Details" : "View Full Details"}
+          <ChevronDown
+            size={16}
+            className={`transition-transform duration-300 ${expanded ? "rotate-180" : ""}`}
+          />
+        </button>
+
+        {/* Expandable details */}
+        <AnimatePresence initial={false}>
+          {expanded && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.35, ease: "easeInOut" }}
+              className="overflow-hidden"
+            >
+              <div className="pt-6 border-t mt-4 space-y-8">
+
+                {/* Shed 4 Details Table */}
+                <div>
+                  <h3 className="font-serif font-bold text-lg text-foreground mb-4">Shed A4 Details</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {malpaniShedDetails.map(({ label, value, icon: Icon }) => (
+                      <div key={label} className="flex items-start gap-3 bg-secondary/40 border border-border rounded-lg p-4">
+                        <div className="w-9 h-9 bg-white rounded-lg flex items-center justify-center text-primary shadow-sm shrink-0">
+                          <Icon size={17} />
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground font-medium">{label}</p>
+                          <p className="text-sm font-bold text-foreground">{value}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Amenity Highlights */}
+                <div>
+                  <h3 className="font-serif font-bold text-lg text-foreground mb-4">Amenity Highlights</h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+                    {malpaniAmenities.map(({ label, desc, icon: Icon }) => (
+                      <div key={label} className="flex flex-col items-center text-center bg-secondary/30 border border-border rounded-xl p-4">
+                        <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-3">
+                          <Icon size={22} />
+                        </div>
+                        <p className="text-xs font-semibold text-foreground leading-tight">{label}</p>
+                        {desc && <p className="text-[10px] text-muted-foreground mt-0.5">{desc}</p>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Contact CTA */}
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Button asChild className="bg-primary text-white hover:bg-primary/90 h-11 px-6 text-sm font-semibold">
+                    <Link href="/contact?interest=industrial">Enquire About Shed A4</Link>
+                  </Button>
+                  <Button asChild variant="outline" className="border-primary text-primary hover:bg-primary hover:text-white h-11 px-6 text-sm font-semibold">
+                    <a href="tel:+919823056983">
+                      Call: +91 98230 56983
+                    </a>
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </motion.div>
   );
 }
 
@@ -301,6 +458,20 @@ export default function Projects() {
 
             </div>
           </motion.div>
+        </div>
+      </section>
+
+      {/* ── Malpani Industrial & Logistic Park — Shed A4 ────────── */}
+      <section className="py-14 bg-white">
+        <div className="container mx-auto px-4 md:px-8">
+
+          {/* Section label */}
+          <div className="flex items-center gap-3 mb-8">
+            <div className="h-0.5 w-8 bg-primary rounded-full" />
+            <span className="text-primary font-semibold text-xs uppercase tracking-[0.18em]">Featured Industrial</span>
+          </div>
+
+          <MalpaniShedA4Card />
         </div>
       </section>
 
