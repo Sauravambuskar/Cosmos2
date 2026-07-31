@@ -126,7 +126,7 @@ function MalpaniShedA4Card() {
       {/* Banner */}
       <div className="relative h-56 md:h-72 overflow-hidden bg-foreground">
         <img
-          src="/images/ind-1.png"
+          src="/images/malpani-shed-a4.png"
           alt="Malpani Industrial and Logistic Park — Shed A4"
           className="w-full h-full object-cover opacity-70"
         />
