@@ -8,14 +8,15 @@ import { Badge } from "@/components/ui/badge";
 import { fetchProjects } from "@/lib/api";
 
 const fallbackProjects = [
-  { id: 1, name: "Cosmos Grandeur", location: "Koregaon Park, Pune", type: "Residential", status: "Completed", units: "42 Exclusive Units", highlights: "Private Pools, Home Automation", image: "/images/proj-1.png" },
-  { id: 2, name: "Cosmos Business Hub", location: "Baner, Pune", type: "Commercial", status: "Ongoing", units: "120 Office Spaces", highlights: "LEED Certified, Smart Parking", image: "/images/com-2.png" },
-  { id: 3, name: "Cosmos Logistics Park", location: "Chakan, Pune", type: "Industrial", status: "Upcoming", units: "5 Million SqFt", highlights: "Grade-A Warehousing", image: "/images/ind-2.png" },
-  { id: 4, name: "Cosmos Heights", location: "Kalyani Nagar, Pune", type: "Residential", status: "Completed", units: "80 Premium Flats", highlights: "Clubhouse, Infinity Pool", image: "/images/res-1.png" },
-  { id: 5, name: "Cosmos Retail Square", location: "Viman Nagar, Pune", type: "Commercial", status: "Completed", units: "45 Retail Shops", highlights: "High Footfall, Anchor Stores", image: "/images/com-3.png" },
-  { id: 6, name: "Cosmos Villas", location: "Aundh, Pune", type: "Residential", status: "Ongoing", units: "15 Luxury Bungalows", highlights: "Gated Community, Private Gardens", image: "/images/res-2.png" },
-  { id: 7, name: "Cosmos IT Park", location: "Kharadi, Pune", type: "Commercial", status: "Upcoming", units: "2 IT Towers", highlights: "Food Court, Co-working Zones", image: "/images/proj-2.png" },
-  { id: 8, name: "Cosmos Riverfront", location: "Mundhwa, Pune", type: "Residential", status: "Upcoming", units: "200 Waterfront Apts", highlights: "River Views, Jogging Track", image: "/images/proj-3.png" },
+  { id: 1, name: "Malpani Industrial & Logistic Park — Shed A4", location: "Ambethan, Chakan", type: "Industrial", status: "Upcoming", units: "2,43,722 sq.ft.", highlights: "61 Acres, 19 Docks, 12m Clear Height, FM2 Floor", image: "/images/malpani-shed-a4.png" },
+  { id: 2, name: "Cosmos Grandeur", location: "Koregaon Park, Pune", type: "Residential", status: "Completed", units: "42 Exclusive Units", highlights: "Private Pools, Home Automation", image: "/images/proj-1.png" },
+  { id: 3, name: "Cosmos Business Hub", location: "Baner, Pune", type: "Commercial", status: "Ongoing", units: "120 Office Spaces", highlights: "LEED Certified, Smart Parking", image: "/images/com-2.png" },
+  { id: 4, name: "Cosmos Logistics Park", location: "Chakan, Pune", type: "Industrial", status: "Upcoming", units: "5 Million SqFt", highlights: "Grade-A Warehousing", image: "/images/ind-2.png" },
+  { id: 5, name: "Cosmos Heights", location: "Kalyani Nagar, Pune", type: "Residential", status: "Completed", units: "80 Premium Flats", highlights: "Clubhouse, Infinity Pool", image: "/images/res-1.png" },
+  { id: 6, name: "Cosmos Retail Square", location: "Viman Nagar, Pune", type: "Commercial", status: "Completed", units: "45 Retail Shops", highlights: "High Footfall, Anchor Stores", image: "/images/com-3.png" },
+  { id: 7, name: "Cosmos Villas", location: "Aundh, Pune", type: "Residential", status: "Ongoing", units: "15 Luxury Bungalows", highlights: "Gated Community, Private Gardens", image: "/images/res-2.png" },
+  { id: 8, name: "Cosmos IT Park", location: "Kharadi, Pune", type: "Commercial", status: "Upcoming", units: "2 IT Towers", highlights: "Food Court, Co-working Zones", image: "/images/proj-2.png" },
+  { id: 9, name: "Cosmos Riverfront", location: "Mundhwa, Pune", type: "Residential", status: "Upcoming", units: "200 Waterfront Apts", highlights: "River Views, Jogging Track", image: "/images/proj-3.png" },
 ];
 
 const featuredStats = [
