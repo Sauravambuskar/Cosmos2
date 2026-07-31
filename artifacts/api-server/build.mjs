@@ -3,28 +3,28 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { build as esbuild } from "esbuild";
 import esbuildPluginPino from "esbuild-plugin-pino";
-import { rm } from "node:fs/promises";
+import { rm, rename } from "node:fs/promises";
 
 // Plugins (e.g. 'esbuild-plugin-pino') may use `require` to resolve dependencies
 globalThis.require = createRequire(import.meta.url);
 
 const artifactDir = path.dirname(fileURLToPath(import.meta.url));
 
+// Vercel discovers serverless functions in the repo-root `api/` directory. The
+// bundle must live there as a self-contained file: `artifacts/api-server/dist`
+// is gitignored and not present when Vercel traces the function's imports, so
+// importing across directories makes the deployment fail.
+const repoRoot = path.resolve(artifactDir, "..", "..");
+const apiDir = path.resolve(repoRoot, "api");
+
 async function buildAll() {
   const distDir = path.resolve(artifactDir, "dist");
   await rm(distDir, { recursive: true, force: true });
 
-  await esbuild({
-    entryPoints: [
-      // Standalone server (local dev / long-running host)
-      path.resolve(artifactDir, "src/index.ts"),
-      // Serverless handler (Vercel) — exports the Express app without listen()
-      path.resolve(artifactDir, "src/serverless.ts"),
-    ],
+  const shared = {
     platform: "node",
     bundle: true,
     format: "esm",
-    outdir: distDir,
     outExtension: { ".js": ".mjs" },
     logLevel: "info",
     // Some packages may not be bundleable, so we externalize them, we can add more here as needed.
@@ -106,7 +106,6 @@ async function buildAll() {
       "puppeteer-core",
       "electron",
     ],
-    sourcemap: "linked",
     plugins: [
       // pino relies on workers to handle logging, instead of externalizing it we use a plugin to handle it
       esbuildPluginPino({ transports: ["pino-pretty"] })
@@ -122,7 +121,31 @@ globalThis.__filename = __bannerUrl.fileURLToPath(import.meta.url);
 globalThis.__dirname = __bannerPath.dirname(globalThis.__filename);
     `,
     },
+  };
+
+  // 1. Standalone server for local dev / long-running hosts.
+  await esbuild({
+    ...shared,
+    entryPoints: [path.resolve(artifactDir, "src/index.ts")],
+    outdir: distDir,
+    sourcemap: "linked",
   });
+
+  // 2. Vercel serverless function. Emitted into `api/` so the deployed file has
+  //    no cross-directory imports to resolve. The pino plugin adds its own
+  //    worker entry points, hence `outdir` rather than `outfile`.
+  await esbuild({
+    ...shared,
+    entryPoints: [path.resolve(artifactDir, "src/serverless.ts")],
+    outdir: apiDir,
+    sourcemap: false,
+  });
+
+  // vercel.json routes /api/* to api/index.mjs, so give the handler that name.
+  await rename(
+    path.resolve(apiDir, "serverless.mjs"),
+    path.resolve(apiDir, "index.mjs"),
+  );
 }
 
 buildAll().catch((err) => {
