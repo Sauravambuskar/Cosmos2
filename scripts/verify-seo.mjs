@@ -15,11 +15,13 @@ function report(pass, label, extra = "") {
 }
 
 // --- Static shell meta ---
-const html = await (await fetch(BASE + "/")).text();
+const raw = await (await fetch(BASE + "/")).text();
+// Meta tags may be pretty-printed across several lines; collapse whitespace so
+// attribute matching does not depend on formatting.
+const html = raw.replace(/\s+/g, " ");
 
 const checks = [
   [/<title>[^<]{20,70}<\/title>/, "title present and reasonable length"],
-  [/<meta name="description" content="[^"]{80,170}"/, "description 80-170 chars"],
   [/<link rel="canonical" href="https:\/\/www\.cosmosrealestate\.co\.in/, "canonical URL"],
   [/<meta name="robots" content="index, follow/, "robots allows indexing"],
   [/<meta property="og:image" content="https:\/\//, "absolute og:image"],
@@ -29,6 +31,10 @@ const checks = [
   [/<meta name="viewport"/, "viewport"],
 ];
 for (const [re, label] of checks) report(re.test(html), label);
+
+// Description length matters for how the snippet renders in search results.
+const desc = html.match(/<meta name="description" content="([^"]*)"/)?.[1] ?? "";
+report(desc.length >= 80 && desc.length <= 170, "description 80-170 chars", `${desc.length} chars`);
 
 report(!/maximum-scale=1/.test(html), "viewport allows zoom (accessibility)");
 
