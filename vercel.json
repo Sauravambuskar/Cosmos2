@@ -1,9 +1,16 @@
 {
-  "buildCommand": "pnpm install --frozen-lockfile && pnpm --filter @workspace/cosmos-realestate run build",
+  "buildCommand": "pnpm install --frozen-lockfile && pnpm --filter @workspace/api-server run build && pnpm --filter @workspace/cosmos-realestate run build",
   "outputDirectory": "artifacts/cosmos-realestate/dist/public",
   "installCommand": "echo skip",
   "framework": null,
+  "functions": {
+    "api/index.mjs": {
+      "maxDuration": 30,
+      "includeFiles": "artifacts/api-server/dist/**"
+    }
+  },
   "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/index.mjs" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }
