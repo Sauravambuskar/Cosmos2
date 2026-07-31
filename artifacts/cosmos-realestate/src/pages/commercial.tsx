@@ -10,6 +10,8 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { fetchProperties, primaryImage, areaLabel, categoryLabel } from "@/lib/api";
 import type { Property } from "@/lib/types";
+import Seo from "@/components/seo";
+import { PAGE_SEO, breadcrumbSchema } from "@/lib/seo";
 
 const TYPE_OPTIONS = ["office", "co-working", "managed-office", "shop", "showroom", "hotel"];
 const HUBS = ["Hinjewadi", "Kharadi", "Baner", "Viman Nagar", "Magarpatta", "SB Road"];
@@ -53,6 +55,16 @@ export default function Commercial() {
 
   return (
     <div className="bg-secondary/20 min-h-screen pb-20">
+      <Seo
+        {...PAGE_SEO.commercial}
+        schemas={[
+          breadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "Commercial Property in Pune", path: "/commercial" },
+          ]),
+        ]}
+      />
+
       {/* Breadcrumb & Header */}
       <div className="bg-white border-b pt-4 pb-6">
         <div className="container mx-auto px-4 md:px-8">

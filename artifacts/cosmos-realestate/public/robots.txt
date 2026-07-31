@@ -1,2 +1,12 @@
+# Cosmos Real Estate
 User-agent: *
 Allow: /
+
+# Admin area is private and must not be indexed.
+Disallow: /admin
+Disallow: /admin/
+
+# Block API responses from search results.
+Disallow: /api/
+
+Sitemap: https://www.cosmosrealestate.co.in/sitemap.xml

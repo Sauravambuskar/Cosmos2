@@ -10,6 +10,8 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { fetchProperties, primaryImage, areaLabel, categoryLabel } from "@/lib/api";
 import type { Property } from "@/lib/types";
+import Seo from "@/components/seo";
+import { PAGE_SEO, breadcrumbSchema } from "@/lib/seo";
 
 const TYPE_OPTIONS = ["flat", "bungalow", "row-house", "duplex"];
 const BHK_OPTIONS = [1, 2, 3, 4, 5];
@@ -45,6 +47,16 @@ export default function Residential() {
 
   return (
     <div className="bg-secondary/20 min-h-screen pb-20">
+      <Seo
+        {...PAGE_SEO.residential}
+        schemas={[
+          breadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "Residential Property in Pune", path: "/residential" },
+          ]),
+        ]}
+      />
+
       {/* Breadcrumb & Header */}
       <div className="bg-white border-b pt-4 pb-6">
         <div className="container mx-auto px-4 md:px-8">

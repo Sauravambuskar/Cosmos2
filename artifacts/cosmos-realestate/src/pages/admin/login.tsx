@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
+import { Helmet } from "react-helmet-async";
 import { Building2, Eye, EyeOff, Lock, User } from "lucide-react";
 import { setAdminToken } from "@/lib/adminAuth";
 
@@ -38,6 +39,11 @@ export default function AdminLogin() {
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <Helmet>
+        <title>Admin Login | Cosmos Real Estate</title>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
+
       <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">

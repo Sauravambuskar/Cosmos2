@@ -6,6 +6,8 @@ import { MapPin, Building, ChevronRight, Download, CheckCircle, Play, Pause, Clo
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { fetchProjects, projectImage } from "@/lib/api";
+import Seo from "@/components/seo";
+import { PAGE_SEO, breadcrumbSchema } from "@/lib/seo";
 
 const PROJECT_TYPES = ["All", "Residential", "Commercial", "Industrial"] as const;
 const PROJECT_STATUSES = ["All", "Completed", "Ongoing", "Upcoming"] as const;
@@ -265,6 +267,15 @@ export default function Projects() {
 
   return (
     <div className="bg-secondary/20 min-h-screen pb-20">
+      <Seo
+        {...PAGE_SEO.projects}
+        schemas={[
+          breadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "Projects", path: "/projects" },
+          ]),
+        ]}
+      />
 
       {/* Page header */}
       <div className="bg-foreground text-white pt-16 pb-12">

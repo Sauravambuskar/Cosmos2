@@ -5,6 +5,8 @@ import { MapPin, ChevronRight, Building, CheckCircle, Download, Calendar, Ruler,
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { fetchProject, projectImage } from "@/lib/api";
+import Seo from "@/components/seo";
+import { SITE_URL, breadcrumbSchema, canonical } from "@/lib/seo";
 
 export default function ProjectDetail() {
   const params = useParams<{ id: string }>();
@@ -44,8 +46,57 @@ export default function ProjectDetail() {
     ? "bg-blue-600 text-white"
     : "bg-orange-500 text-white";
 
+  // Derive metadata from the project so each detail page targets its own terms.
+  const seoTitle = `${project.name} | ${project.location} | Cosmos Real Estate`;
+  const seoDescription = (
+    project.description ||
+    `${project.name} — ${project.type} project in ${project.location}. ${project.units} ${project.status}.`
+  )
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 157);
+
+  const projectSchema = {
+    "@context": "https://schema.org",
+    "@type": "Place",
+    name: project.name,
+    description: seoDescription,
+    url: canonical(`/projects/${project.id}`),
+    image: `${SITE_URL}${projectImage(project)}`,
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: project.location,
+      addressRegion: "Maharashtra",
+      addressCountry: "IN",
+    },
+    ...(project.amenities.length > 0 && {
+      amenityFeature: project.amenities.map((a) => ({
+        "@type": "LocationFeatureSpecification",
+        name: a,
+        value: true,
+      })),
+    }),
+  };
+
   return (
     <div className="bg-secondary/20 min-h-screen pb-20">
+      <Seo
+        title={seoTitle.slice(0, 65)}
+        description={seoDescription}
+        path={`/projects/${project.id}`}
+        type="article"
+        image={projectImage(project)}
+        keywords={`${project.name}, ${project.type} ${project.location}, ${project.highlights}`}
+        schemas={[
+          projectSchema,
+          breadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "Projects", path: "/projects" },
+            { name: project.name, path: `/projects/${project.id}` },
+          ]),
+        ]}
+      />
+
       {/* Hero Banner */}
       <div className="relative h-72 md:h-96 overflow-hidden">
         <img

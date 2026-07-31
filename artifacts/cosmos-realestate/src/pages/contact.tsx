@@ -8,6 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { submitContact } from "@/lib/api";
+import Seo from "@/components/seo";
+import { PAGE_SEO, breadcrumbSchema, localBusinessSchema } from "@/lib/seo";
 
 // Map the detailed UI interest options to the CMS interest buckets.
 function mapInterest(value: string): string {
@@ -62,6 +64,17 @@ export default function Contact() {
 
   return (
     <div className="w-full bg-secondary/20 min-h-screen pb-20">
+      <Seo
+        {...PAGE_SEO.contact}
+        schemas={[
+          localBusinessSchema(),
+          breadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "Contact Us", path: "/contact" },
+          ]),
+        ]}
+      />
+
       <div className="bg-foreground text-white pt-16 pb-12">
         <div className="container mx-auto px-4 md:px-8">
           <div className="flex items-center text-sm text-white/60 mb-6">

@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { fetchProperties, fetchProjects, primaryImage, areaLabel, categoryLabel, projectImage } from "@/lib/api";
+import Seo from "@/components/seo";
+import { PAGE_SEO, localBusinessSchema, websiteSchema } from "@/lib/seo";
 
 const stats = [
   { value: "500+", label: "Properties Listed" },
@@ -63,6 +65,11 @@ export default function Home() {
 
   return (
     <div className="w-full">
+      <Seo
+        {...PAGE_SEO.home}
+        schemas={[localBusinessSchema(), websiteSchema()]}
+      />
+
       {/* Hero Section */}
       <section className="relative min-h-[600px] flex items-center justify-center pt-10 pb-20">
         <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-black/40 z-10" />

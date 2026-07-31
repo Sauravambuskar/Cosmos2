@@ -10,6 +10,7 @@ import {
   Home,
   FolderKanban,
 } from "lucide-react";
+import { Helmet } from "react-helmet-async";
 import { clearAdminToken } from "@/lib/adminAuth";
 
 const navItems = [
@@ -30,6 +31,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <div className="min-h-screen flex bg-gray-100">
+      {/* Admin pages must never be indexed or appear in search results. */}
+      <Helmet>
+        <title>Admin Panel | Cosmos Real Estate</title>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
+
       {/* Sidebar */}
       <aside
         className={`${

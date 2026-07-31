@@ -2,10 +2,23 @@ import { motion } from "framer-motion";
 import { Link } from "wouter";
 import { Award, Briefcase, GraduationCap, Users, ChevronRight, CheckCircle2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import Seo from "@/components/seo";
+import { PAGE_SEO, breadcrumbSchema, localBusinessSchema } from "@/lib/seo";
 
 export default function About() {
   return (
     <div className="w-full bg-secondary/20 min-h-screen pb-20">
+      <Seo
+        {...PAGE_SEO.about}
+        schemas={[
+          localBusinessSchema(),
+          breadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "About Us", path: "/about" },
+          ]),
+        ]}
+      />
+
       <div className="bg-foreground text-white pt-16 pb-12">
         <div className="container mx-auto px-4 md:px-8">
           <div className="flex items-center text-sm text-white/60 mb-6">
