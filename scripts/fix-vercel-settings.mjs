@@ -1,62 +1,64 @@
 /**
- * Clears the dashboard-level overrides that prevent the repo-root vercel.json
- * from taking effect (rootDirectory pinned to artifacts/api-server, framework
- * misdetected as nitro, and build/output commands duplicated in the dashboard).
+ * Clears the dashboard-level overrides on the project that serves
+ * cosmosrealestate.co.in so the repo-root vercel.json takes effect.
+ *
+ * Why this is needed: the project had rootDirectory pinned to
+ * artifacts/api-server, which made Vercel resolve outputDirectory relative to
+ * that folder and fail with 'No Output Directory named "public" found'. It also
+ * hid the repo-root api/ function directory. Framework was misdetected as nitro.
  */
 import { readFileSync } from "node:fs";
-import { execSync } from "node:child_process";
 
-const project = JSON.parse(readFileSync(".vercel/project.json", "utf-8"));
+const PROJECT_ID = "prj_PJH1UBvE0pLWF6xiIFc7OkhFIbCU"; // cosmos2-api-server
+const TEAM_ID = "team_15kGsD13J9aJUf5ytEh3tmXD";
 
-// The CLI stores its token in an auth.json under one of these roots.
 function findToken() {
-  const candidates = [
+  const roots = [
+    `${process.env.APPDATA}\\com.vercel.cli\\Data\\auth.json`,
+    `${process.env.APPDATA}\\xdg.data\\com.vercel.cli\\auth.json`,
     `${process.env.APPDATA}\\com.vercel.cli\\auth.json`,
     `${process.env.LOCALAPPDATA}\\com.vercel.cli\\auth.json`,
-    `${process.env.USERPROFILE}\\.local\\share\\com.vercel.cli\\auth.json`,
-    `${process.env.XDG_DATA_HOME ?? ""}/com.vercel.cli/auth.json`,
-    `${process.env.HOME ?? ""}/.local/share/com.vercel.cli/auth.json`,
   ];
-  for (const p of candidates) {
+  for (const p of roots) {
     try {
       const j = JSON.parse(readFileSync(p, "utf-8"));
       if (j.token) return j.token;
-    } catch {
-      /* try next */
-    }
+    } catch { /* next */ }
   }
   return null;
 }
 
 const token = findToken();
 if (!token) {
-  console.error("Could not locate Vercel CLI token.");
+  console.error("NO_TOKEN — run `npx vercel login` first");
   process.exit(1);
 }
 
-const url = `https://api.vercel.com/v9/projects/${project.projectId}?teamId=${project.orgId}`;
+const url = `https://api.vercel.com/v9/projects/${PROJECT_ID}?teamId=${TEAM_ID}`;
 const headers = { Authorization: `Bearer ${token}`, "Content-Type": "application/json" };
 
-const before = await (await fetch(url, { headers })).json();
-console.log("BEFORE:");
-console.log("  rootDirectory  :", before.rootDirectory);
-console.log("  framework      :", before.framework);
-console.log("  buildCommand   :", before.buildCommand);
-console.log("  outputDirectory:", before.outputDirectory);
-
-// null = "inherit from vercel.json / repo root"
-const patch = {
-  rootDirectory: null,
-  framework: null,
-  buildCommand: null,
-  outputDirectory: null,
-  installCommand: null,
+const show = (label, p) => {
+  console.log(label);
+  console.log("  rootDirectory  :", p.rootDirectory);
+  console.log("  framework      :", p.framework);
+  console.log("  buildCommand   :", p.buildCommand);
+  console.log("  outputDirectory:", p.outputDirectory);
+  console.log("  installCommand :", p.installCommand);
 };
 
+show("BEFORE:", await (await fetch(url, { headers })).json());
+
+// null = inherit from repo-root vercel.json
 const res = await fetch(url, {
   method: "PATCH",
   headers,
-  body: JSON.stringify(patch),
+  body: JSON.stringify({
+    rootDirectory: null,
+    framework: null,
+    buildCommand: null,
+    outputDirectory: null,
+    installCommand: null,
+  }),
 });
 
 if (!res.ok) {
@@ -64,10 +66,5 @@ if (!res.ok) {
   process.exit(1);
 }
 
-const after = await res.json();
-console.log("\nAFTER:");
-console.log("  rootDirectory  :", after.rootDirectory);
-console.log("  framework      :", after.framework);
-console.log("  buildCommand   :", after.buildCommand);
-console.log("  outputDirectory:", after.outputDirectory);
+show("\nAFTER:", await res.json());
 console.log("\nSettings now inherit from repo-root vercel.json");
