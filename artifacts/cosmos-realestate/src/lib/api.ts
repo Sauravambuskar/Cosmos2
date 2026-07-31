@@ -117,3 +117,17 @@ export async function fetchProject(id: number): Promise<Project> {
   }
   return (await res.json()) as Project;
 }
+
+const PROJECT_FALLBACK_IMAGES: Record<string, string> = {
+  Residential: "/images/res-1.png",
+  Commercial: "/images/com-1.png",
+  Industrial: "/images/ind-1.png",
+};
+
+/**
+ * Cover image for a project. The CMS image field is optional, so fall back to a
+ * type-appropriate stock image rather than rendering a broken image element.
+ */
+export function projectImage(project: Pick<Project, "image" | "type">): string {
+  return project.image || PROJECT_FALLBACK_IMAGES[project.type] || "/images/proj-1.png";
+}

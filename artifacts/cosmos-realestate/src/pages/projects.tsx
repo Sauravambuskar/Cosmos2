@@ -5,19 +5,10 @@ import { useQuery } from "@tanstack/react-query";
 import { MapPin, Building, ChevronRight, Download, CheckCircle, Play, Pause, Clock, Ruler, Award, Factory, ChevronDown, Warehouse, Truck, Layers, FileText, Trees, Users, Monitor, Coffee } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { fetchProjects } from "@/lib/api";
+import { fetchProjects, projectImage } from "@/lib/api";
 
-const fallbackProjects = [
-  { id: 1, name: "Malpani Industrial & Logistic Park — Shed A4", location: "Ambethan, Chakan", type: "Industrial", status: "Upcoming", units: "2,43,722 sq.ft.", highlights: "61 Acres, 19 Docks, 12m Clear Height, FM2 Floor", image: "/images/malpani-shed-a4.png" },
-  { id: 2, name: "Cosmos Grandeur", location: "Koregaon Park, Pune", type: "Residential", status: "Completed", units: "42 Exclusive Units", highlights: "Private Pools, Home Automation", image: "/images/proj-1.png" },
-  { id: 3, name: "Cosmos Business Hub", location: "Baner, Pune", type: "Commercial", status: "Ongoing", units: "120 Office Spaces", highlights: "LEED Certified, Smart Parking", image: "/images/com-2.png" },
-  { id: 4, name: "Cosmos Logistics Park", location: "Chakan, Pune", type: "Industrial", status: "Upcoming", units: "5 Million SqFt", highlights: "Grade-A Warehousing", image: "/images/ind-2.png" },
-  { id: 5, name: "Cosmos Heights", location: "Kalyani Nagar, Pune", type: "Residential", status: "Completed", units: "80 Premium Flats", highlights: "Clubhouse, Infinity Pool", image: "/images/res-1.png" },
-  { id: 6, name: "Cosmos Retail Square", location: "Viman Nagar, Pune", type: "Commercial", status: "Completed", units: "45 Retail Shops", highlights: "High Footfall, Anchor Stores", image: "/images/com-3.png" },
-  { id: 7, name: "Cosmos Villas", location: "Aundh, Pune", type: "Residential", status: "Ongoing", units: "15 Luxury Bungalows", highlights: "Gated Community, Private Gardens", image: "/images/res-2.png" },
-  { id: 8, name: "Cosmos IT Park", location: "Kharadi, Pune", type: "Commercial", status: "Upcoming", units: "2 IT Towers", highlights: "Food Court, Co-working Zones", image: "/images/proj-2.png" },
-  { id: 9, name: "Cosmos Riverfront", location: "Mundhwa, Pune", type: "Residential", status: "Upcoming", units: "200 Waterfront Apts", highlights: "River Views, Jogging Track", image: "/images/proj-3.png" },
-];
+const PROJECT_TYPES = ["All", "Residential", "Commercial", "Industrial"] as const;
+const PROJECT_STATUSES = ["All", "Completed", "Ongoing", "Upcoming"] as const;
 
 const featuredStats = [
   { icon: Ruler,   label: "Total Area",        value: "19,000 Sq. Ft." },
@@ -254,17 +245,23 @@ function MalpaniShedA4Card() {
 }
 
 export default function Projects() {
-  const { data: apiProjects, isLoading } = useQuery({
+  const [typeFilter, setTypeFilter] = useState<string>("All");
+  const [statusFilter, setStatusFilter] = useState<string>("All");
+
+  // Projects are managed entirely from the admin CMS — this is the single
+  // source of truth, so edits there appear here without a code change.
+  const { data: apiProjects = [], isLoading, isError } = useQuery({
     queryKey: ["projects"],
     queryFn: () => fetchProjects(),
-    staleTime: 30_000, // Refetch every 30s for near-real-time sync
+    staleTime: 30_000,
     refetchInterval: 30_000,
   });
 
-  // Use API data if available, otherwise show fallback
-  const projects = apiProjects && apiProjects.length > 0
-    ? apiProjects.map((p) => ({ id: p.id, name: p.name, location: p.location, type: p.type, status: p.status, units: p.units, highlights: p.highlights, image: p.image || "/images/proj-1.png", brochureUrl: p.brochureUrl }))
-    : fallbackProjects.map((p) => ({ ...p, brochureUrl: "" }));
+  const projects = apiProjects.filter((p) => {
+    if (typeFilter !== "All" && p.type !== typeFilter) return false;
+    if (statusFilter !== "All" && p.status !== statusFilter) return false;
+    return true;
+  });
 
   return (
     <div className="bg-secondary/20 min-h-screen pb-20">
@@ -478,11 +475,65 @@ export default function Projects() {
 
       {/* ── All Projects ─────────────────────────────────────────── */}
       <div className="container mx-auto px-4 md:px-8 mt-4">
-        <div className="flex items-center gap-3 mb-8">
-          <div className="h-0.5 w-8 bg-primary rounded-full" />
-          <span className="text-primary font-semibold text-xs uppercase tracking-[0.18em]">All Projects</span>
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+          <div className="flex items-center gap-3">
+            <div className="h-0.5 w-8 bg-primary rounded-full" />
+            <span className="text-primary font-semibold text-xs uppercase tracking-[0.18em]">All Projects</span>
+            {!isLoading && !isError && (
+              <span className="text-muted-foreground text-xs">
+                {projects.length} {projects.length === 1 ? "project" : "projects"}
+              </span>
+            )}
+          </div>
+
+          {/* Filters — driven by the same values the CMS uses */}
+          <div className="flex flex-wrap items-center gap-2">
+            <select
+              value={typeFilter}
+              onChange={(e) => setTypeFilter(e.target.value)}
+              aria-label="Filter projects by type"
+              className="border border-border bg-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+            >
+              {PROJECT_TYPES.map((t) => (
+                <option key={t} value={t}>{t === "All" ? "All Types" : t}</option>
+              ))}
+            </select>
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              aria-label="Filter projects by status"
+              className="border border-border bg-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+            >
+              {PROJECT_STATUSES.map((s) => (
+                <option key={s} value={s}>{s === "All" ? "All Statuses" : s}</option>
+              ))}
+            </select>
+          </div>
         </div>
 
+        {isLoading ? (
+          <div className="flex items-center justify-center h-64">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+          </div>
+        ) : isError ? (
+          <div className="text-center py-20 text-muted-foreground bg-white rounded-xl border border-dashed">
+            <Building size={40} className="mx-auto mb-3 opacity-30" />
+            <p className="font-medium">Couldn't load projects</p>
+            <p className="text-sm mt-1">Please try again in a moment.</p>
+          </div>
+        ) : projects.length === 0 ? (
+          <div className="text-center py-20 text-muted-foreground bg-white rounded-xl border border-dashed">
+            <Building size={40} className="mx-auto mb-3 opacity-30" />
+            <p className="font-medium">
+              {apiProjects.length === 0 ? "No projects published yet" : "No projects match these filters"}
+            </p>
+            <p className="text-sm mt-1">
+              {apiProjects.length === 0
+                ? "Projects added in the admin panel will appear here."
+                : "Try widening your selection."}
+            </p>
+          </div>
+        ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {projects.map((project, index) => (
             <motion.div
@@ -495,7 +546,7 @@ export default function Projects() {
             >
               <div className="relative h-56 overflow-hidden">
                 <img
-                  src={project.image}
+                  src={projectImage(project)}
                   alt={project.name}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
@@ -558,6 +609,7 @@ export default function Projects() {
             </motion.div>
           ))}
         </div>
+        )}
       </div>
     </div>
   );

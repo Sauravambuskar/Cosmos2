@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { fetchProperties, primaryImage, areaLabel, categoryLabel } from "@/lib/api";
+import { fetchProperties, fetchProjects, primaryImage, areaLabel, categoryLabel, projectImage } from "@/lib/api";
 
 const stats = [
   { value: "500+", label: "Properties Listed" },
@@ -27,6 +27,27 @@ export default function Home() {
   const { data: featuredProperties = [] } = useQuery({
     queryKey: ["properties", "featured"],
     queryFn: () => fetchProperties({ featured: true }),
+  });
+
+  // All active properties — used to show real per-category counts.
+  const { data: allProperties = [] } = useQuery({
+    queryKey: ["properties", "all"],
+    queryFn: () => fetchProperties(),
+  });
+
+  // Featured projects come from the CMS too (mark a project as "Featured").
+  const { data: featuredProjects = [] } = useQuery({
+    queryKey: ["projects", "featured"],
+    queryFn: () => fetchProjects({ featured: true }),
+  });
+
+  const categoryCards = [
+    { title: "Residential", type: "residential", img: "/images/res-1.png", link: "/residential" },
+    { title: "Commercial", type: "commercial", img: "/images/com-1.png", link: "/commercial" },
+    { title: "Industrial & Warehouse", type: "industrial", img: "/images/ind-1.png", link: "/industrial" },
+  ].map((c) => {
+    const count = allProperties.filter((p) => p.type === c.type).length;
+    return { ...c, count: count === 1 ? "1 Property" : `${count} Properties` };
   });
 
   const handleSearch = () => {
@@ -142,11 +163,7 @@ export default function Home() {
           <h2 className="text-3xl font-serif font-bold text-foreground mb-10 text-center">Browse by Category</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              { title: "Residential", count: "320+ Properties", img: "/images/res-1.png", link: "/residential" },
-              { title: "Commercial", count: "150+ Properties", img: "/images/com-1.png", link: "/commercial" },
-              { title: "Industrial & Warehouse", count: "80+ Properties", img: "/images/ind-1.png", link: "/industrial" },
-            ].map((cat, i) => (
+            {categoryCards.map((cat, i) => (
               <Link key={i} href={cat.link}>
                 <motion.div 
                   initial={{ opacity: 0, y: 20 }}
@@ -267,28 +284,35 @@ export default function Home() {
         <div className="container mx-auto px-4 md:px-8">
           <h2 className="text-3xl font-serif font-bold text-foreground mb-10 text-center">Featured Projects</h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              { title: "Cosmos Grandeur", location: "Koregaon Park", type: "Ultra Luxury 4/5 BHK", status: "Ready to Move", img: "/images/proj-1.png" },
-              { title: "Cosmos Business Hub", location: "Baner", type: "Premium Office Spaces", status: "Under Construction", img: "/images/com-2.png" },
-              { title: "Cosmos Logistics Park", location: "Chakan", type: "Grade A Warehouses", status: "Leasing Now", img: "/images/ind-2.png" },
-            ].map((proj, i) => (
-              <div key={i} className="bg-white border rounded-xl overflow-hidden shadow-sm group">
-                <div className="relative h-64 overflow-hidden">
-                  <img src={proj.img} alt={proj.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                  <Badge className="absolute top-4 left-4 bg-black/80 text-white hover:bg-black/80">{proj.status}</Badge>
+          {featuredProjects.length === 0 ? (
+            <div className="text-center py-16 text-muted-foreground border border-dashed border-border rounded-xl">
+              <p className="font-medium">No featured projects yet</p>
+              <p className="text-sm mt-1">Projects marked as featured in the admin panel will appear here.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {featuredProjects.slice(0, 3).map((proj) => (
+                <div key={proj.id} className="bg-white border rounded-xl overflow-hidden shadow-sm group">
+                  <div className="relative h-64 overflow-hidden">
+                    <img
+                      src={projectImage(proj)}
+                      alt={proj.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <Badge className="absolute top-4 left-4 bg-black/80 text-white hover:bg-black/80">{proj.status}</Badge>
+                  </div>
+                  <div className="p-6 text-center">
+                    <h3 className="text-xl font-bold text-foreground mb-1 line-clamp-1">{proj.name}</h3>
+                    <p className="text-muted-foreground text-sm mb-4"><MapPin size={14} className="inline mr-1" />{proj.location}</p>
+                    <p className="font-semibold text-primary mb-4">{proj.units || proj.type}</p>
+                    <Button variant="outline" className="w-full" asChild>
+                      <Link href={`/projects/${proj.id}`}>View Details</Link>
+                    </Button>
+                  </div>
                 </div>
-                <div className="p-6 text-center">
-                  <h3 className="text-xl font-bold text-foreground mb-1">{proj.title}</h3>
-                  <p className="text-muted-foreground text-sm mb-4"><MapPin size={14} className="inline mr-1" />{proj.location}</p>
-                  <p className="font-semibold text-primary mb-4">{proj.type}</p>
-                  <Button variant="outline" className="w-full" asChild>
-                    <Link href="/projects">View Details</Link>
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
     </div>
