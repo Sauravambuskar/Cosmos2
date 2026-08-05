@@ -182,7 +182,6 @@ export default function Contact() {
                   <div>
                     <h4 className="font-bold text-sm mb-1 text-foreground">Email Address</h4>
                     <p className="text-muted-foreground text-sm mb-1">jatin@cosmosrealestate.in</p>
-                    <p className="text-muted-foreground text-sm">cosmosestate@gmail.com</p>
                   </div>
                 </div>
 
