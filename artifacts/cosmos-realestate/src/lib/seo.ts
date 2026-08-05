@@ -16,6 +16,7 @@ export const BUSINESS = {
   legalName: "Cosmos Real Estate",
   phone: "+91-9823056983",
   altPhone: "+91-9325097895",
+  email: "cosmosestate@gmail.com",
   street: "Shop No B4, Upper Ground, Fifth Avenue, Dholepatil Road",
   city: "Pune",
   region: "Maharashtra",
@@ -113,6 +114,7 @@ export function localBusinessSchema() {
     description:
       "Cosmos Real Estate is a NAR India certified real estate consultancy in Pune offering residential, commercial and industrial property advisory since 2004.",
     telephone: BUSINESS.phone,
+    email: BUSINESS.email,
     foundingDate: BUSINESS.foundingYear,
     priceRange: "₹₹",
     address: {
