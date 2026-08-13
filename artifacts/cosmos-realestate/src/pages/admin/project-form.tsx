@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { useLocation, useParams } from "wouter";
 import { ArrowLeft, Save } from "lucide-react";
 import AdminLayout from "@/components/admin-layout";
-import { adminFetch, isAdminLoggedIn } from "@/lib/adminAuth";
+import { adminFetch, adminJson, readError } from "@/lib/adminAuth";
+import { useSiteSettings } from "@/hooks/use-site-settings";
 import type { Project } from "@/lib/types";
 
 const PROJECT_TYPES = ["Residential", "Commercial", "Industrial"] as const;
@@ -47,7 +48,7 @@ const defaultForm: FormState = {
   rera: "",
   possession: "",
   priceRange: "",
-  developer: "Cosmos Real Estate",
+  developer: "",
   featured: false,
   active: true,
 };
@@ -56,6 +57,7 @@ export default function ProjectForm() {
   const [, setLocation] = useLocation();
   const params = useParams<{ id?: string }>();
   const isEdit = !!params.id && params.id !== "new";
+  const settings = useSiteSettings();
 
   const [form, setForm] = useState<FormState>(defaultForm);
   const [loading, setLoading] = useState(false);
@@ -63,15 +65,15 @@ export default function ProjectForm() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!isAdminLoggedIn()) { setLocation("/admin/login"); return; }
     if (!isEdit) return;
     async function load() {
       try {
-        const res = await adminFetch(`/api/admin/projects`);
-        if (!res.ok) return;
-        const all = await res.json() as Project[];
+        const all = await adminJson<Project[]>("/api/admin/projects");
         const proj = all.find((p) => p.id === parseInt(params.id!, 10));
-        if (!proj) return;
+        if (!proj) {
+          setError("That project no longer exists. It may have been deleted.");
+          return;
+        }
         setForm({
           name: proj.name,
           description: proj.description,
@@ -93,12 +95,21 @@ export default function ProjectForm() {
           featured: proj.featured,
           active: proj.active,
         });
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Could not load this project");
       } finally {
         setFetchLoading(false);
       }
     }
-    load();
-  }, [isEdit, params.id, setLocation]);
+    void load();
+  }, [isEdit, params.id]);
+
+  // A new project defaults to your own business name from Site Settings.
+  useEffect(() => {
+    if (!isEdit && !form.developer) {
+      setForm((prev) => (prev.developer ? prev : { ...prev, developer: settings.brand.legalName }));
+    }
+  }, [isEdit, settings.brand.legalName, form.developer]);
 
   function set(field: keyof FormState, value: string | boolean) {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -136,8 +147,7 @@ export default function ProjectForm() {
       const res = await adminFetch(url, { method, body: JSON.stringify(payload) });
 
       if (!res.ok) {
-        const data = await res.json() as { error?: string };
-        setError(data.error ?? "Failed to save project");
+        setError(await readError(res));
         return;
       }
       setLocation("/admin/projects");

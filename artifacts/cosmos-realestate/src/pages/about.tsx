@@ -4,18 +4,23 @@ import { Award, Briefcase, GraduationCap, Users, ChevronRight, CheckCircle2 } fr
 import { Badge } from "@/components/ui/badge";
 import Seo from "@/components/seo";
 import { PAGE_SEO, breadcrumbSchema, localBusinessSchema } from "@/lib/seo";
+import { useSiteSettings } from "@/hooks/use-site-settings";
 
 export default function About() {
+  const settings = useSiteSettings();
   return (
     <div className="w-full bg-secondary/20 min-h-screen pb-20">
       <Seo
         {...PAGE_SEO.about}
         schemas={[
-          localBusinessSchema(),
-          breadcrumbSchema([
-            { name: "Home", path: "/" },
-            { name: "About Us", path: "/about" },
-          ]),
+          localBusinessSchema(settings),
+          breadcrumbSchema(
+            [
+              { name: "Home", path: "/" },
+              { name: "About Us", path: "/about" },
+            ],
+            settings,
+          ),
         ]}
       />
 

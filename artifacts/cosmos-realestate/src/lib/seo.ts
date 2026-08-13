@@ -1,10 +1,13 @@
 /**
  * Central SEO configuration.
  *
- * Keeping copy and structured data here (rather than inline in pages) means
- * titles, descriptions and business details stay consistent and are edited in
- * one place.
+ * The values below are build-time fallbacks. Anything an admin can edit lives in
+ * Site Settings (`/api/settings`) and is passed into the helpers here as an
+ * optional override, so the structured data on the page matches the business
+ * details currently configured in the panel.
  */
+
+import type { SiteSettings } from "./site-settings";
 
 export const SITE_URL = "https://www.cosmosrealestate.co.in";
 export const SITE_NAME = "Cosmos Real Estate";
@@ -96,39 +99,55 @@ export const PAGE_SEO: Record<string, PageSeo> = {
   },
 };
 
-export function canonical(path: string): string {
-  return path === "/" ? `${SITE_URL}/` : `${SITE_URL}${path}`;
+/** Site root, honouring the admin-configured URL when one is available. */
+export function siteUrl(settings?: SiteSettings): string {
+  return (settings?.seo.siteUrl || SITE_URL).replace(/\/$/, "");
+}
+
+export function canonical(path: string, settings?: SiteSettings): string {
+  const root = siteUrl(settings);
+  return path === "/" ? `${root}/` : `${root}${path}`;
 }
 
 /** Organisation + LocalBusiness schema for the site as a whole. */
-export function localBusinessSchema() {
+export function localBusinessSchema(settings?: SiteSettings) {
+  const root = siteUrl(settings);
+  const contact = settings?.contact;
+  const seo = settings?.seo;
+  const phone = contact?.phonePrimary || BUSINESS.phone;
+  const areaServed = seo?.areaServed || BUSINESS.areaServed;
+  const ogImage = seo?.ogImage
+    ? seo.ogImage.startsWith("http")
+      ? seo.ogImage
+      : `${root}${seo.ogImage}`
+    : DEFAULT_OG_IMAGE;
+
   return {
     "@context": "https://schema.org",
     "@type": "RealEstateAgent",
-    "@id": `${SITE_URL}/#organization`,
-    name: BUSINESS.name,
-    legalName: BUSINESS.legalName,
-    url: SITE_URL,
-    logo: `${SITE_URL}/favicon.svg`,
-    image: DEFAULT_OG_IMAGE,
-    description:
-      "Cosmos Real Estate is a NAR India certified real estate consultancy in Pune offering residential, commercial and industrial property advisory since 2004.",
-    telephone: BUSINESS.phone,
-    email: BUSINESS.email,
-    foundingDate: BUSINESS.foundingYear,
+    "@id": `${root}/#organization`,
+    name: settings?.brand.legalName || BUSINESS.name,
+    legalName: settings?.brand.legalName || BUSINESS.legalName,
+    url: root,
+    logo: settings?.brand.logoUrl || `${root}/favicon.svg`,
+    image: ogImage,
+    description: seo?.defaultDescription ?? BUSINESS_DESCRIPTION,
+    telephone: phone,
+    email: contact?.email || BUSINESS.email,
+    foundingDate: seo?.foundingYear || BUSINESS.foundingYear,
     priceRange: "₹₹",
     address: {
       "@type": "PostalAddress",
-      streetAddress: BUSINESS.street,
-      addressLocality: BUSINESS.city,
-      addressRegion: BUSINESS.region,
-      postalCode: BUSINESS.postalCode,
-      addressCountry: BUSINESS.country,
+      streetAddress: contact?.street || BUSINESS.street,
+      addressLocality: contact?.city || BUSINESS.city,
+      addressRegion: contact?.region || BUSINESS.region,
+      postalCode: contact?.postalCode || BUSINESS.postalCode,
+      addressCountry: contact?.country || BUSINESS.country,
     },
     geo: {
       "@type": "GeoCoordinates",
-      latitude: BUSINESS.latitude,
-      longitude: BUSINESS.longitude,
+      latitude: Number(contact?.latitude ?? BUSINESS.latitude),
+      longitude: Number(contact?.longitude ?? BUSINESS.longitude),
     },
     openingHoursSpecification: {
       "@type": "OpeningHoursSpecification",
@@ -136,13 +155,13 @@ export function localBusinessSchema() {
       opens: "09:30",
       closes: "19:00",
     },
-    areaServed: BUSINESS.areaServed.split(", ").map((name) => ({
+    areaServed: areaServed.split(", ").map((name) => ({
       "@type": "City",
       name,
     })),
     contactPoint: {
       "@type": "ContactPoint",
-      telephone: BUSINESS.phone,
+      telephone: phone,
       contactType: "sales",
       areaServed: "IN",
       availableLanguage: ["English", "Hindi", "Marathi"],
@@ -150,19 +169,26 @@ export function localBusinessSchema() {
   };
 }
 
-export function websiteSchema() {
+const BUSINESS_DESCRIPTION =
+  "Cosmos Real Estate is a NAR India certified real estate consultancy in Pune offering residential, commercial and industrial property advisory since 2004.";
+
+export function websiteSchema(settings?: SiteSettings) {
+  const root = siteUrl(settings);
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "@id": `${SITE_URL}/#website`,
-    url: SITE_URL,
-    name: SITE_NAME,
-    publisher: { "@id": `${SITE_URL}/#organization` },
+    "@id": `${root}/#website`,
+    url: root,
+    name: settings?.seo.siteName || SITE_NAME,
+    publisher: { "@id": `${root}/#organization` },
   };
 }
 
 /** Breadcrumb trail so search results show the site hierarchy. */
-export function breadcrumbSchema(trail: { name: string; path: string }[]) {
+export function breadcrumbSchema(
+  trail: { name: string; path: string }[],
+  settings?: SiteSettings,
+) {
   return {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -170,7 +196,7 @@ export function breadcrumbSchema(trail: { name: string; path: string }[]) {
       "@type": "ListItem",
       position: i + 1,
       name: item.name,
-      item: canonical(item.path),
+      item: canonical(item.path, settings),
     })),
   };
 }

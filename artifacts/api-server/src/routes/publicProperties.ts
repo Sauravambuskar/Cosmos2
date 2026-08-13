@@ -1,6 +1,7 @@
 import { Router, type IRouter } from "express";
 import { eq, and, desc } from "drizzle-orm";
-import { db, propertiesTable, contactsTable, insertContactSchema } from "@workspace/db";
+import { db, propertiesTable, contactsTable, publicContactSchema } from "@workspace/db";
+import { readSiteSettings } from "./settings";
 
 const router: IRouter = Router();
 
@@ -44,13 +45,27 @@ router.get("/properties/:id", async (req, res): Promise<void> => {
 });
 
 router.post("/contacts", async (req, res): Promise<void> => {
-  const parsed = insertContactSchema.safeParse(req.body);
+  // Validated with the narrow public schema — the lead-pipeline fields
+  // (leadStatus / notes / readAt) belong to staff and are not accepted here.
+  const parsed = publicContactSchema.safeParse(req.body);
   if (!parsed.success) {
-    res.status(400).json({ error: parsed.error.message });
+    res.status(400).json({ error: parsed.error.issues[0]?.message ?? "Invalid submission" });
     return;
   }
-  const [contact] = await db.insert(contactsTable).values(parsed.data).returning();
-  res.status(201).json(contact);
+
+  const settings = await readSiteSettings().catch(() => null);
+  if (settings && !settings.features.contactFormEnabled) {
+    res.status(503).json({ error: "The enquiry form is currently closed. Please call us instead." });
+    return;
+  }
+
+  const [contact] = await db
+    .insert(contactsTable)
+    .values({ ...parsed.data, leadStatus: "new" })
+    .returning();
+
+  req.log.info({ id: contact.id, interest: contact.interest }, "New public enquiry");
+  res.status(201).json({ id: contact.id, ok: true });
 });
 
 export default router;

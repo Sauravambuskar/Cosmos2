@@ -21,6 +21,8 @@ import PropertyForm from "@/pages/admin/property-form";
 import AdminProjects from "@/pages/admin/projects";
 import ProjectFormAdmin from "@/pages/admin/project-form";
 import AdminContacts from "@/pages/admin/contacts";
+import AdminSettings from "@/pages/admin/settings";
+import AdminAccount from "@/pages/admin/account";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +42,8 @@ function App() {
             <Route path="/admin/projects/:id/edit" component={ProjectFormAdmin} />
             <Route path="/admin/projects" component={AdminProjects} />
             <Route path="/admin/contacts" component={AdminContacts} />
+            <Route path="/admin/settings" component={AdminSettings} />
+            <Route path="/admin/account" component={AdminAccount} />
             <Route path="/admin" component={AdminDashboard} />
 
             {/* Public routes — wrapped in Layout */}

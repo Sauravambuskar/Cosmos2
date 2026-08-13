@@ -35,5 +35,11 @@ export const insertProjectSchema = createInsertSchema(projectsTable).omit({
 
 export const updateProjectSchema = insertProjectSchema.partial();
 
+/** Bulk operations from the admin projects table. */
+export const bulkProjectSchema = z.object({
+  ids: z.array(z.number().int().positive()).min(1, "Select at least one project"),
+  action: z.enum(["activate", "deactivate", "feature", "unfeature", "delete"]),
+});
+
 export type InsertProject = z.infer<typeof insertProjectSchema>;
 export type Project = typeof projectsTable.$inferSelect;

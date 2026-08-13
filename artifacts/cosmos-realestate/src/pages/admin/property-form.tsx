@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { useLocation, useParams } from "wouter";
 import { ArrowLeft, Save } from "lucide-react";
 import AdminLayout from "@/components/admin-layout";
-import { adminFetch, isAdminLoggedIn } from "@/lib/adminAuth";
+import { adminFetch, adminJson, readError } from "@/lib/adminAuth";
+import { useSiteSettings } from "@/hooks/use-site-settings";
 import type { Property } from "@/lib/types";
 
 const PROPERTY_TYPES = ["residential", "commercial", "industrial"] as const;
@@ -12,11 +13,6 @@ const CATEGORIES: Record<string, string[]> = {
   industrial: ["warehouse", "factory", "industrial-plot", "cold-storage"],
 };
 const TRANSACTION_TYPES = ["buy", "rent"] as const;
-const LOCATIONS = [
-  "Koregaon Park, Pune", "Baner, Pune", "Kalyani Nagar, Pune",
-  "Viman Nagar, Pune", "Aundh, Pune", "Wakad, Pune", "Kharadi, Pune",
-  "Hinjewadi, Pune", "Chakan, Pune", "Bhosari, Pune", "Talegaon, Pune", "Other",
-];
 
 type FormState = {
   title: string; description: string; type: string; category: string;
@@ -28,7 +24,7 @@ type FormState = {
 const defaultForm: FormState = {
   title: "", description: "", type: "residential", category: "flat",
   transactionType: "buy", price: "", priceValue: "0",
-  area: "0", bhk: "", location: LOCATIONS[0], address: "",
+  area: "0", bhk: "", location: "", address: "",
   images: "", amenities: "", status: "active", featured: false,
 };
 
@@ -36,6 +32,8 @@ export default function PropertyForm() {
   const [, setLocation] = useLocation();
   const params = useParams<{ id?: string }>();
   const isEdit = !!params.id && params.id !== "new";
+  const settings = useSiteSettings();
+  const locations = settings.locations;
 
   const [form, setForm] = useState<FormState>(defaultForm);
   const [loading, setLoading] = useState(false);
@@ -43,15 +41,17 @@ export default function PropertyForm() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!isAdminLoggedIn()) { setLocation("/admin/login"); return; }
     if (!isEdit) return;
     async function load() {
       try {
-        const res = await adminFetch(`/api/admin/properties`);
-        if (!res.ok) return;
-        const all = await res.json() as Property[];
+        const all = await adminJson<Property[]>("/api/admin/properties");
         const prop = all.find((p) => p.id === parseInt(params.id!, 10));
-        if (!prop) return;
+        if (!prop) {
+          // Better than leaving a blank "create" form that would silently
+          // produce a second listing when saved.
+          setError("That listing no longer exists. It may have been deleted.");
+          return;
+        }
         setForm({
           title: prop.title, description: prop.description,
           type: prop.type, category: prop.category,
@@ -62,12 +62,21 @@ export default function PropertyForm() {
           images: prop.images.join("\n"), amenities: prop.amenities.join(", "),
           status: prop.status, featured: prop.featured,
         });
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Could not load this listing");
       } finally {
         setFetchLoading(false);
       }
     }
-    load();
-  }, [isEdit, params.id, setLocation]);
+    void load();
+  }, [isEdit, params.id]);
+
+  // Default the locality to the first configured one, once settings arrive.
+  useEffect(() => {
+    if (!isEdit && !form.location && locations.length) {
+      setForm((prev) => (prev.location ? prev : { ...prev, location: locations[0] }));
+    }
+  }, [isEdit, locations, form.location]);
 
   function set(field: keyof FormState, value: string | boolean) {
     setForm((prev) => {
@@ -105,8 +114,7 @@ export default function PropertyForm() {
       const res = await adminFetch(url, { method, body: JSON.stringify(payload) });
 
       if (!res.ok) {
-        const data = await res.json() as { error?: string };
-        setError(data.error ?? "Failed to save property");
+        setError(await readError(res));
         return;
       }
       setLocation("/admin/properties");
@@ -226,8 +234,19 @@ export default function PropertyForm() {
             <div>
               <label className={labelClass}>Locality *</label>
               <select value={form.location} onChange={(e) => set("location", e.target.value)} className={inputClass} data-testid="select-location">
-                {LOCATIONS.map((l) => <option key={l} value={l}>{l}</option>)}
+                {/* An existing listing may sit in a locality that has since been
+                    removed from settings — keep it selectable so editing the
+                    listing doesn't silently move it somewhere else. */}
+                {(locations.includes(form.location) || !form.location
+                  ? locations
+                  : [form.location, ...locations]
+                ).map((l) => (
+                  <option key={l} value={l}>{l}</option>
+                ))}
               </select>
+              <p className="text-xs text-gray-400 mt-1">
+                Manage this list in Site Settings → Locations.
+              </p>
             </div>
             <div>
               <label className={labelClass}>Full Address</label>

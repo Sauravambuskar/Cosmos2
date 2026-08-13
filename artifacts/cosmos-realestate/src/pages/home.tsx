@@ -10,13 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { fetchProperties, fetchProjects, primaryImage, areaLabel, categoryLabel, projectImage } from "@/lib/api";
 import Seo from "@/components/seo";
 import { PAGE_SEO, localBusinessSchema, websiteSchema } from "@/lib/seo";
-
-const stats = [
-  { value: "500+", label: "Properties Listed" },
-  { value: "20+", label: "Years Experience" },
-  { value: "1000+", label: "Happy Clients" },
-  { value: "Pune's #1", label: "Real Estate Broker" },
-];
+import { useSiteSettings } from "@/hooks/use-site-settings";
 
 /** Hero category chips → the listing page and database category slug they filter to. */
 const CATEGORY_LINKS: Record<string, { page: string; slug: string }> = {
@@ -35,6 +29,8 @@ export default function Home() {
   const [, setLocation] = useLocation();
   const [searchVal, setSearchVal] = useState("");
   const [activeTab, setActiveTab] = useState("buy");
+  const settings = useSiteSettings();
+  const { home, features } = settings;
 
   // Featured listings are managed from the admin CMS (mark a property as "Featured").
   const { data: featuredProperties = [] } = useQuery({
@@ -90,15 +86,18 @@ export default function Home() {
     <div className="w-full">
       <Seo
         {...PAGE_SEO.home}
-        schemas={[localBusinessSchema(), websiteSchema()]}
+        title={settings.seo.defaultTitle || PAGE_SEO.home.title}
+        description={settings.seo.defaultDescription || PAGE_SEO.home.description}
+        keywords={settings.seo.defaultKeywords || PAGE_SEO.home.keywords}
+        schemas={[localBusinessSchema(settings), websiteSchema(settings)]}
       />
 
       {/* Hero Section */}
       <section className="relative min-h-[600px] flex items-center justify-center pt-10 pb-20">
         <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-black/40 z-10" />
-        <div 
-          className="absolute inset-0 bg-cover bg-center" 
-          style={{ backgroundImage: "url('/images/hero-bg.png')" }} 
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: `url('${home.heroImage}')` }}
         />
         
         <div className="container relative z-20 mx-auto px-4 md:px-8 pt-10">
@@ -109,10 +108,10 @@ export default function Home() {
             className="max-w-4xl mx-auto text-center"
           >
             <h1 className="text-4xl md:text-6xl font-serif text-white font-bold leading-tight mb-4 shadow-black drop-shadow-xl">
-              Find Your Perfect Property in <span className="text-primary">Pune</span>
+              {home.heroTitle} <span className="text-primary">{home.heroHighlight}</span>
             </h1>
             <p className="text-lg md:text-xl text-white/90 mb-10 font-medium tracking-wide drop-shadow-md">
-              Buy, Sell, or Rent — Residential, Commercial & Industrial Properties
+              {home.heroSubtitle}
             </p>
 
             <div className="bg-white p-4 rounded-xl shadow-2xl max-w-4xl mx-auto">
@@ -130,8 +129,8 @@ export default function Home() {
                     className="flex flex-col md:flex-row items-center justify-between gap-4 p-3 bg-primary/5 rounded-lg border border-primary/20"
                   >
                     <div className="text-left pl-2">
-                      <h4 className="font-serif font-bold text-foreground text-lg">Looking to Sell or Lease Your Property in Pune?</h4>
-                      <p className="text-muted-foreground text-sm">List it with Cosmos Real Estate for 100% verified buyers & hassle-free deal closure.</p>
+                      <h4 className="font-serif font-bold text-foreground text-lg">{home.sellPitchTitle}</h4>
+                      <p className="text-muted-foreground text-sm">{home.sellPitchText}</p>
                     </div>
                     <Button asChild className="h-14 px-10 text-base font-bold bg-primary hover:bg-primary/90 text-white rounded-md shrink-0">
                       <Link href="/contact?interest=sell_property">List Your Property</Link>
@@ -176,18 +175,20 @@ export default function Home() {
       </section>
 
       {/* Stats Row */}
-      <section className="bg-white border-b py-8 shadow-sm relative z-30 -mt-10 mx-4 md:mx-8 rounded-lg">
-        <div className="container mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center divide-x divide-border">
-            {stats.map((stat, index) => (
-              <div key={index} className="px-4">
-                <div className="text-2xl md:text-3xl font-serif text-foreground font-bold mb-1">{stat.value}</div>
-                <div className="text-muted-foreground text-xs md:text-sm font-medium uppercase tracking-wider">{stat.label}</div>
-              </div>
-            ))}
+      {features.showStatsBar && home.stats.length > 0 && (
+        <section className="bg-white border-b py-8 shadow-sm relative z-30 -mt-10 mx-4 md:mx-8 rounded-lg">
+          <div className="container mx-auto">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center divide-x divide-border">
+              {home.stats.map((stat, index) => (
+                <div key={index} className="px-4">
+                  <div className="text-2xl md:text-3xl font-serif text-foreground font-bold mb-1">{stat.value}</div>
+                  <div className="text-muted-foreground text-xs md:text-sm font-medium uppercase tracking-wider">{stat.label}</div>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Browse by Category */}
       <section className="py-20 bg-secondary/50">
@@ -218,12 +219,13 @@ export default function Home() {
       </section>
 
       {/* Featured Properties */}
+      {features.showFeaturedProperties && (
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4 md:px-8">
           <div className="flex flex-col md:flex-row justify-between items-end mb-10">
             <div>
-              <h2 className="text-3xl font-serif font-bold text-foreground mb-2">Featured Properties</h2>
-              <p className="text-muted-foreground">Handpicked luxury properties in prime locations</p>
+              <h2 className="text-3xl font-serif font-bold text-foreground mb-2">{home.featuredPropertiesTitle}</h2>
+              <p className="text-muted-foreground">{home.featuredPropertiesSubtitle}</p>
             </div>
             <Button variant="outline" asChild className="hidden md:inline-flex border-primary text-primary hover:bg-primary hover:text-white">
               <Link href="/residential">View All Properties</Link>
@@ -272,13 +274,14 @@ export default function Home() {
           </Button>
         </div>
       </section>
+      )}
 
       {/* Why Choose Us */}
       <section className="py-20 bg-secondary">
         <div className="container mx-auto px-4 md:px-8">
           <div className="text-center max-w-2xl mx-auto mb-16">
-            <h2 className="text-3xl font-serif font-bold text-foreground mb-4">Why Cosmos Real Estate?</h2>
-            <p className="text-muted-foreground text-lg">Pune's most trusted real estate advisory, offering end-to-end property solutions.</p>
+            <h2 className="text-3xl font-serif font-bold text-foreground mb-4">{home.whyTitle}</h2>
+            <p className="text-muted-foreground text-lg">{home.whySubtitle}</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -312,9 +315,10 @@ export default function Home() {
       </section>
 
       {/* Recent Projects */}
+      {features.showFeaturedProjects && (
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4 md:px-8">
-          <h2 className="text-3xl font-serif font-bold text-foreground mb-10 text-center">Featured Projects</h2>
+          <h2 className="text-3xl font-serif font-bold text-foreground mb-10 text-center">{home.featuredProjectsTitle}</h2>
           
           {featuredProjects.length === 0 ? (
             <div className="text-center py-16 text-muted-foreground border border-dashed border-border rounded-xl">
@@ -347,6 +351,7 @@ export default function Home() {
           )}
         </div>
       </section>
+      )}
     </div>
   );
 }

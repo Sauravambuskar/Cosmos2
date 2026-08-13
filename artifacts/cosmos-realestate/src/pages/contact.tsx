@@ -10,6 +10,8 @@ import { useToast } from "@/hooks/use-toast";
 import { submitContact } from "@/lib/api";
 import Seo from "@/components/seo";
 import { PAGE_SEO, breadcrumbSchema, localBusinessSchema } from "@/lib/seo";
+import { useSiteSettings } from "@/hooks/use-site-settings";
+import { phoneDigits } from "@/lib/site-settings";
 
 // Map the detailed UI interest options to the CMS interest buckets.
 function mapInterest(value: string): string {
@@ -21,6 +23,8 @@ function mapInterest(value: string): string {
 
 export default function Contact() {
   const { toast } = useToast();
+  const settings = useSiteSettings();
+  const { contact, features } = settings;
 
   // Parse interest from query parameter if present
   const params = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
@@ -67,11 +71,14 @@ export default function Contact() {
       <Seo
         {...PAGE_SEO.contact}
         schemas={[
-          localBusinessSchema(),
-          breadcrumbSchema([
-            { name: "Home", path: "/" },
-            { name: "Contact Us", path: "/contact" },
-          ]),
+          localBusinessSchema(settings),
+          breadcrumbSchema(
+            [
+              { name: "Home", path: "/" },
+              { name: "Contact Us", path: "/contact" },
+            ],
+            settings,
+          ),
         ]}
       />
 
@@ -95,6 +102,27 @@ export default function Contact() {
           {/* Contact Form */}
           <div className="lg:col-span-8 bg-white p-8 md:p-10 rounded-xl shadow-sm border">
             <h2 className="text-2xl font-serif font-bold mb-6 text-foreground">Send an Inquiry</h2>
+            {!features.contactFormEnabled ? (
+              <div className="text-center py-10">
+                <p className="text-muted-foreground mb-6">
+                  Our enquiry form is temporarily closed. Please reach us directly — we reply quickly.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  {contact.phonePrimary && (
+                    <Button asChild className="bg-primary text-white h-12 px-8">
+                      <a href={`tel:${phoneDigits(contact.phonePrimary)}`}>Call {contact.phonePrimary}</a>
+                    </Button>
+                  )}
+                  {contact.whatsapp && (
+                    <Button asChild variant="outline" className="h-12 px-8">
+                      <a href={`https://wa.me/${phoneDigits(contact.whatsapp)}`} target="_blank" rel="noopener noreferrer">
+                        WhatsApp us
+                      </a>
+                    </Button>
+                  )}
+                </div>
+              </div>
+            ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
@@ -144,6 +172,7 @@ export default function Contact() {
                 {submitting ? "Submitting…" : "Submit Inquiry"}
               </Button>
             </form>
+            )}
           </div>
 
           {/* Contact Info */}
@@ -159,7 +188,7 @@ export default function Contact() {
                   <div>
                     <h4 className="font-bold text-sm mb-1 text-foreground">Office Address</h4>
                     <p className="text-muted-foreground text-sm leading-relaxed">
-                      Shop No B4, Upper Ground, Fifth Avenue, Dholepatil Road, Pune - 411001
+                      {contact.addressLine}
                     </p>
                   </div>
                 </div>
@@ -170,8 +199,11 @@ export default function Contact() {
                   </div>
                   <div>
                     <h4 className="font-bold text-sm mb-1 text-foreground">Phone & WhatsApp</h4>
-                    <p className="text-muted-foreground text-sm mb-1">+91 9823056983</p>
-                    <p className="text-muted-foreground text-sm mb-1">+91 9325097895</p>
+                    {[contact.phonePrimary, contact.phoneSecondary].filter(Boolean).map((p) => (
+                      <a key={p} href={`tel:${phoneDigits(p)}`} className="block text-muted-foreground text-sm mb-1 hover:text-primary transition-colors">
+                        {p}
+                      </a>
+                    ))}
                   </div>
                 </div>
 
@@ -181,7 +213,9 @@ export default function Contact() {
                   </div>
                   <div>
                     <h4 className="font-bold text-sm mb-1 text-foreground">Email Address</h4>
-                    <p className="text-muted-foreground text-sm mb-1">cosmosestate@gmail.com</p>
+                    <a href={`mailto:${contact.email}`} className="text-muted-foreground text-sm mb-1 hover:text-primary transition-colors">
+                      {contact.email}
+                    </a>
                   </div>
                 </div>
 
@@ -191,27 +225,40 @@ export default function Contact() {
                   </div>
                   <div>
                     <h4 className="font-bold text-sm mb-1 text-foreground">Working Hours</h4>
-                    <p className="text-muted-foreground text-sm">Mon - Sat: 9:30 AM - 7:00 PM</p>
-                    <p className="text-muted-foreground text-sm">Sunday: By Appointment</p>
+                    <p className="text-muted-foreground text-sm">{contact.workingHours}</p>
+                    <p className="text-muted-foreground text-sm">{contact.workingHoursNote}</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            <Button asChild className="w-full bg-[#25D366] hover:bg-[#128C7E] text-white h-14 text-base font-bold shadow-md">
-              <a href="https://wa.me/919823056983" target="_blank" rel="noopener noreferrer">
-                <SiWhatsapp className="mr-2" size={24} /> Chat on WhatsApp
-              </a>
-            </Button>
-            
-            {/* Map Placeholder */}
-            <div className="h-48 bg-muted rounded-xl border border-border w-full flex items-center justify-center relative overflow-hidden shadow-sm">
-                <img src={`https://placehold.co/600x400/e2e8f0/64748b?text=Map:+Dholepatil+Road,+Pune`} alt="Map of Dholepatil Road" className="w-full h-full object-cover opacity-70" />
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-foreground font-semibold font-serif">
-                  <MapPin size={28} className="text-primary mb-2 drop-shadow-md" />
-                  <span className="bg-white/90 px-3 py-1 rounded text-sm shadow-sm">Dholepatil Road, Pune</span>
-                </div>
-            </div>
+            {contact.whatsapp && (
+              <Button asChild className="w-full bg-[#25D366] hover:bg-[#128C7E] text-white h-14 text-base font-bold shadow-md">
+                <a href={`https://wa.me/${phoneDigits(contact.whatsapp)}`} target="_blank" rel="noopener noreferrer">
+                  <SiWhatsapp className="mr-2" size={24} /> Chat on WhatsApp
+                </a>
+              </Button>
+            )}
+
+            {/* A real embedded map once one is configured in Site Settings,
+                otherwise a labelled placeholder rather than a broken frame. */}
+            {contact.mapEmbedUrl ? (
+              <iframe
+                src={contact.mapEmbedUrl}
+                title={`Map of ${contact.city}`}
+                className="h-48 w-full rounded-xl border border-border shadow-sm"
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                allowFullScreen
+              />
+            ) : (
+              <div className="h-48 bg-muted rounded-xl border border-border w-full flex flex-col items-center justify-center gap-2 shadow-sm">
+                <MapPin size={28} className="text-primary drop-shadow-md" />
+                <span className="bg-white/90 px-3 py-1 rounded text-sm shadow-sm font-serif font-semibold text-foreground">
+                  {contact.city}
+                </span>
+              </div>
+            )}
           </div>
         </div>
       </div>

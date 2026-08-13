@@ -1,16 +1,31 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Helmet } from "react-helmet-async";
-import { Building2, Eye, EyeOff, Lock, User } from "lucide-react";
-import { setAdminToken } from "@/lib/adminAuth";
+import { Building2, Eye, EyeOff, Lock, User, Clock } from "lucide-react";
+import { setAdminToken, isAdminLoggedIn } from "@/lib/adminAuth";
+import { useSiteSettings } from "@/hooks/use-site-settings";
 
 export default function AdminLogin() {
   const [, setLocation] = useLocation();
+  const settings = useSiteSettings();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const params = new URLSearchParams(
+    typeof window !== "undefined" ? window.location.search : "",
+  );
+  // Set by the session guard when a token lapses, so the redirect is explained
+  // rather than looking like a random bounce back to the login screen.
+  const expired = params.get("reason") === "expired";
+  const returnTo = params.get("from");
+
+  // Someone with a live session landing here goes straight through.
+  useEffect(() => {
+    if (isAdminLoggedIn() && !expired) setLocation("/admin");
+  }, [expired, setLocation]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -29,7 +44,8 @@ export default function AdminLogin() {
       }
       const data = await res.json() as { token: string };
       setAdminToken(data.token);
-      setLocation("/admin");
+      // Land back on the page they were trying to reach when the session lapsed.
+      setLocation(returnTo && returnTo.startsWith("/admin") ? returnTo : "/admin");
     } catch {
       setError("Connection error. Please try again.");
     } finally {
@@ -40,7 +56,7 @@ export default function AdminLogin() {
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
       <Helmet>
-        <title>Admin Login | Cosmos Real Estate</title>
+        <title>{`Admin Login | ${settings.brand.legalName}`}</title>
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
 
@@ -51,8 +67,15 @@ export default function AdminLogin() {
             <Building2 className="text-white" size={28} />
           </div>
           <h1 className="text-2xl font-bold text-gray-900">Admin Login</h1>
-          <p className="text-gray-500 text-sm mt-1">Cosmos Real Estate Management</p>
+          <p className="text-gray-500 text-sm mt-1">{settings.brand.legalName} Management</p>
         </div>
+
+        {expired && (
+          <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 text-amber-800 text-sm rounded-lg px-4 py-3 mb-5">
+            <Clock size={16} className="flex-shrink-0 mt-0.5" />
+            <span>Your session expired. Sign in again to pick up where you left off.</span>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Username */}
@@ -122,7 +145,7 @@ export default function AdminLogin() {
         </form>
 
         <p className="text-center text-xs text-gray-400 mt-6">
-          Cosmos Real Estate — Restricted Area
+          {settings.brand.legalName} — Restricted Area
         </p>
       </div>
     </div>

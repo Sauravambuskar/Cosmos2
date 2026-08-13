@@ -31,5 +31,11 @@ export const insertPropertySchema = createInsertSchema(propertiesTable).omit({
 
 export const updatePropertySchema = insertPropertySchema.partial();
 
+/** Bulk operations from the admin listings table. */
+export const bulkPropertySchema = z.object({
+  ids: z.array(z.number().int().positive()).min(1, "Select at least one listing"),
+  action: z.enum(["activate", "deactivate", "feature", "unfeature", "delete"]),
+});
+
 export type InsertProperty = z.infer<typeof insertPropertySchema>;
 export type Property = typeof propertiesTable.$inferSelect;
