@@ -18,7 +18,18 @@ const stats = [
   { value: "Pune's #1", label: "Real Estate Broker" },
 ];
 
-const categories = ["Flat", "Bungalow", "Row House", "Office", "Shop", "Warehouse", "Co-working"];
+/** Hero category chips → the listing page and database category slug they filter to. */
+const CATEGORY_LINKS: Record<string, { page: string; slug: string }> = {
+  Flat: { page: "/residential", slug: "flat" },
+  Bungalow: { page: "/residential", slug: "bungalow" },
+  "Row House": { page: "/residential", slug: "row-house" },
+  Office: { page: "/commercial", slug: "office" },
+  Shop: { page: "/commercial", slug: "shop" },
+  Warehouse: { page: "/industrial", slug: "warehouse" },
+  "Co-working": { page: "/commercial", slug: "co-working" },
+};
+
+const categories = Object.keys(CATEGORY_LINKS);
 
 export default function Home() {
   const [, setLocation] = useLocation();
@@ -55,12 +66,24 @@ export default function Home() {
   const handleSearch = () => {
     if (activeTab === "sell") {
       setLocation("/contact?interest=sell_property");
-    } else {
-      const queryParams = new URLSearchParams();
-      if (searchVal) queryParams.append("search", searchVal);
-      queryParams.append("type", activeTab);
-      setLocation(`/residential?${queryParams.toString()}`);
+      return;
     }
+    // Search the whole catalogue rather than guessing a listing page from the
+    // wording: "Chakan" or a project name says nothing about which of the three
+    // pages holds the match, and guessing wrong shows an empty result set for a
+    // property we actually have. Buy/rent goes along as a filter the visitor
+    // can widen on the results page.
+    const queryParams = new URLSearchParams();
+    const q = searchVal.trim();
+    if (q) queryParams.set("q", q);
+    queryParams.set("transaction", activeTab);
+    setLocation(`/search?${queryParams.toString()}`);
+  };
+
+  /** Category chips under the hero jump straight to that category's listings. */
+  const categoryLink = (category: string) => {
+    const { page, slug } = CATEGORY_LINKS[category];
+    return `${page}?transaction=${activeTab === "sell" ? "buy" : activeTab}&category=${slug}`;
   };
 
   return (
@@ -141,9 +164,11 @@ export default function Home() {
 
             <div className="mt-8 flex flex-wrap justify-center gap-2">
               {categories.map((cat) => (
-                <Badge key={cat} variant="secondary" className="px-4 py-2 bg-white/20 hover:bg-white/30 text-white border-white/30 backdrop-blur-sm cursor-pointer transition-colors text-sm font-medium">
-                  {cat}
-                </Badge>
+                <Link key={cat} href={categoryLink(cat)}>
+                  <Badge variant="secondary" className="px-4 py-2 bg-white/20 hover:bg-white/30 text-white border-white/30 backdrop-blur-sm cursor-pointer transition-colors text-sm font-medium">
+                    {cat}
+                  </Badge>
+                </Link>
               ))}
             </div>
           </motion.div>

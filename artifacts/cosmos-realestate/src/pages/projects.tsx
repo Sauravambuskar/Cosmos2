@@ -6,6 +6,8 @@ import { MapPin, Building, ChevronRight, Download, CheckCircle, Play, Pause, Clo
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { fetchProjects, projectImage } from "@/lib/api";
+import { matchesProjectQuery } from "@/lib/search";
+import ListingSearch from "@/components/listing-search";
 import Seo from "@/components/seo";
 import { PAGE_SEO, breadcrumbSchema } from "@/lib/seo";
 
@@ -249,6 +251,7 @@ function MalpaniShedA4Card() {
 export default function Projects() {
   const [typeFilter, setTypeFilter] = useState<string>("All");
   const [statusFilter, setStatusFilter] = useState<string>("All");
+  const [query, setQuery] = useState("");
 
   // Projects are managed entirely from the admin CMS — this is the single
   // source of truth, so edits there appear here without a code change.
@@ -262,6 +265,7 @@ export default function Projects() {
   const projects = apiProjects.filter((p) => {
     if (typeFilter !== "All" && p.type !== typeFilter) return false;
     if (statusFilter !== "All" && p.status !== statusFilter) return false;
+    if (!matchesProjectQuery(p, query)) return false;
     return true;
   });
 
@@ -499,6 +503,12 @@ export default function Projects() {
 
           {/* Filters — driven by the same values the CMS uses */}
           <div className="flex flex-wrap items-center gap-2">
+            <ListingSearch
+              value={query}
+              onChange={setQuery}
+              placeholder="Search projects, developers, localities…"
+              className="w-full sm:w-64"
+            />
             <select
               value={typeFilter}
               onChange={(e) => setTypeFilter(e.target.value)}

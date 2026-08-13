@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronRight, MapPin, SlidersHorizontal, Heart, PhoneCall, Building2 } from "lucide-react";
@@ -9,6 +9,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { fetchProperties, primaryImage, areaLabel, categoryLabel } from "@/lib/api";
+import { matchesPropertyQuery } from "@/lib/search";
+import { useListingFilters } from "@/hooks/use-listing-filters";
+import ListingSearch from "@/components/listing-search";
 import type { Property } from "@/lib/types";
 import Seo from "@/components/seo";
 import { PAGE_SEO, breadcrumbSchema } from "@/lib/seo";
@@ -16,14 +19,19 @@ import { PAGE_SEO, breadcrumbSchema } from "@/lib/seo";
 const TYPE_OPTIONS = ["flat", "bungalow", "row-house", "duplex"];
 const BHK_OPTIONS = [1, 2, 3, 4, 5];
 const LOCALITIES = ["Koregaon Park", "Kalyani Nagar", "Baner", "Viman Nagar", "Kharadi", "Aundh"];
+const MAX_BUDGET = 2000; // ₹ lakhs — the slider's ceiling doubles as "no budget filter"
 
 export default function Residential() {
-  const [budget, setBudget] = useState([1500]);
-  const [transaction, setTransaction] = useState<"buy" | "rent">("buy");
-  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+  const { query, setQuery, transaction, setTransaction, urlCategories } = useListingFilters();
+  const [budget, setBudget] = useState([MAX_BUDGET]);
+  const [selectedTypes, setSelectedTypes] = useState<string[]>(urlCategories);
   const [selectedBhk, setSelectedBhk] = useState<number[]>([]);
   const [selectedLocalities, setSelectedLocalities] = useState<string[]>([]);
-  const [appliedFilters, setAppliedFilters] = useState(0); // bump to force re-filter memo
+
+  // Follow category links from the nav / home page after the page is mounted.
+  useEffect(() => {
+    setSelectedTypes(urlCategories);
+  }, [urlCategories]);
 
   const { data: properties = [], isLoading, isError } = useQuery({
     queryKey: ["properties", "residential", transaction],
@@ -35,15 +43,30 @@ export default function Residential() {
   }
 
   const filtered = useMemo(() => {
-    void appliedFilters;
     return properties.filter((p) => {
+      if (!matchesPropertyQuery(p, query)) return false;
       if (selectedTypes.length && !selectedTypes.includes(p.category)) return false;
       if (selectedBhk.length && (p.bhk == null || !selectedBhk.includes(p.bhk))) return false;
       if (selectedLocalities.length && !selectedLocalities.some((l) => p.location.toLowerCase().includes(l.toLowerCase()))) return false;
-      if (p.priceValue > budget[0]) return false;
+      if (budget[0] < MAX_BUDGET && p.priceValue > budget[0]) return false;
       return true;
     });
-  }, [properties, selectedTypes, selectedBhk, selectedLocalities, budget, appliedFilters]);
+  }, [properties, query, selectedTypes, selectedBhk, selectedLocalities, budget]);
+
+  const hasFilters =
+    query !== "" ||
+    selectedTypes.length > 0 ||
+    selectedBhk.length > 0 ||
+    selectedLocalities.length > 0 ||
+    budget[0] < MAX_BUDGET;
+
+  function clearAll() {
+    setQuery("");
+    setSelectedTypes([]);
+    setSelectedBhk([]);
+    setSelectedLocalities([]);
+    setBudget([MAX_BUDGET]);
+  }
 
   return (
     <div className="bg-secondary/20 min-h-screen pb-20">
@@ -69,7 +92,9 @@ export default function Residential() {
             <div>
               <h1 className="text-2xl md:text-3xl font-serif font-bold text-foreground">Residential Properties {transaction === "buy" ? "for Sale" : "for Rent"} in Pune</h1>
               <p className="text-muted-foreground text-sm mt-1">
-                {isLoading ? "Loading properties…" : `Showing ${filtered.length} ${filtered.length === 1 ? "Property" : "Properties"} in Pune`}
+                {isLoading
+                  ? "Loading properties…"
+                  : `Showing ${filtered.length} ${filtered.length === 1 ? "Property" : "Properties"}${query ? ` for "${query}"` : ""} in Pune`}
               </p>
             </div>
             <Tabs value={transaction} onValueChange={(v) => setTransaction(v as "buy" | "rent")} className="w-[200px]">
@@ -79,6 +104,13 @@ export default function Residential() {
               </TabsList>
             </Tabs>
           </div>
+
+          <ListingSearch
+            value={query}
+            onChange={setQuery}
+            placeholder="Search flats, bungalows, localities…"
+            className="mt-5 max-w-xl"
+          />
         </div>
       </div>
 
@@ -126,11 +158,11 @@ export default function Residential() {
               <div className="mb-6">
                 <h3 className="font-semibold text-foreground mb-4 text-sm flex justify-between">
                   <span>Max Budget</span>
-                  <span className="text-primary font-bold">₹{budget[0]} L</span>
+                  <span className="text-primary font-bold">{budget[0] >= MAX_BUDGET ? "Any" : `₹${budget[0]} L`}</span>
                 </h3>
                 <Slider
                   value={budget}
-                  max={2000}
+                  max={MAX_BUDGET}
                   step={10}
                   onValueChange={setBudget}
                   className="mb-2"
@@ -150,19 +182,11 @@ export default function Residential() {
                 </div>
               </div>
 
-              <Button
-                className="w-full mt-4 bg-primary hover:bg-primary/90 text-white"
-                onClick={() => setAppliedFilters((n) => n + 1)}
-              >
-                Apply Filters
-              </Button>
-              {(selectedTypes.length > 0 || selectedBhk.length > 0 || selectedLocalities.length > 0 || budget[0] < 2000) && (
-                <button
-                  className="w-full mt-2 text-sm text-muted-foreground hover:text-primary"
-                  onClick={() => { setSelectedTypes([]); setSelectedBhk([]); setSelectedLocalities([]); setBudget([2000]); }}
-                >
-                  Clear all
-                </button>
+              {/* Filters apply as you pick them — this only resets everything. */}
+              {hasFilters && (
+                <Button variant="outline" className="w-full mt-4" onClick={clearAll}>
+                  Clear all filters
+                </Button>
               )}
             </div>
           </aside>
@@ -182,8 +206,15 @@ export default function Residential() {
             ) : filtered.length === 0 ? (
               <div className="text-center py-20 text-muted-foreground">
                 <Building2 size={40} className="mx-auto mb-3 opacity-30" />
-                <p className="font-medium">No properties match your filters</p>
+                <p className="font-medium">
+                  {query ? `No residential properties match "${query}"` : "No properties match your filters"}
+                </p>
                 <p className="text-sm mt-1">Try widening your search criteria.</p>
+                {hasFilters && (
+                  <Button variant="outline" className="mt-4" onClick={clearAll}>
+                    Clear all filters
+                  </Button>
+                )}
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">

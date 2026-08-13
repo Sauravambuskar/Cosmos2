@@ -63,18 +63,18 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     <div>
                       <h4 className="font-serif font-bold text-primary mb-2 border-b pb-1">Buy</h4>
                       <ul className="space-y-2">
-                        <li><Link href="/residential?type=buy&category=flat" className="text-sm text-foreground hover:text-primary block">Buy Flat</Link></li>
-                        <li><Link href="/residential?type=buy&category=bungalow" className="text-sm text-foreground hover:text-primary block">Buy Bungalow</Link></li>
-                        <li><Link href="/residential?type=buy&category=rowhouse" className="text-sm text-foreground hover:text-primary block">Buy Row House</Link></li>
-                        <li><Link href="/residential?type=buy&category=duplex" className="text-sm text-foreground hover:text-primary block">Buy Duplex</Link></li>
+                        <li><Link href="/residential?transaction=buy&category=flat" className="text-sm text-foreground hover:text-primary block">Buy Flat</Link></li>
+                        <li><Link href="/residential?transaction=buy&category=bungalow" className="text-sm text-foreground hover:text-primary block">Buy Bungalow</Link></li>
+                        <li><Link href="/residential?transaction=buy&category=row-house" className="text-sm text-foreground hover:text-primary block">Buy Row House</Link></li>
+                        <li><Link href="/residential?transaction=buy&category=duplex" className="text-sm text-foreground hover:text-primary block">Buy Duplex</Link></li>
                       </ul>
                     </div>
                     <div>
                       <h4 className="font-serif font-bold text-primary mb-2 border-b pb-1">Rent</h4>
                       <ul className="space-y-2">
-                        <li><Link href="/residential?type=rent&category=flat" className="text-sm text-foreground hover:text-primary block">Rent Flat</Link></li>
-                        <li><Link href="/residential?type=rent&category=bungalow" className="text-sm text-foreground hover:text-primary block">Rent Bungalow</Link></li>
-                        <li><Link href="/residential?type=rent&category=rowhouse" className="text-sm text-foreground hover:text-primary block">Rent Row House</Link></li>
+                        <li><Link href="/residential?transaction=rent&category=flat" className="text-sm text-foreground hover:text-primary block">Rent Flat</Link></li>
+                        <li><Link href="/residential?transaction=rent&category=bungalow" className="text-sm text-foreground hover:text-primary block">Rent Bungalow</Link></li>
+                        <li><Link href="/residential?transaction=rent&category=row-house" className="text-sm text-foreground hover:text-primary block">Rent Row House</Link></li>
                       </ul>
                     </div>
                   </motion.div>
@@ -100,17 +100,17 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     <div>
                       <h4 className="font-serif font-bold text-primary mb-2 border-b pb-1">Buy</h4>
                       <ul className="space-y-2">
-                        <li><Link href="/commercial?type=buy&category=office" className="text-sm text-foreground hover:text-primary block">Buy Office</Link></li>
-                        <li><Link href="/commercial?type=buy&category=shop" className="text-sm text-foreground hover:text-primary block">Buy Shop/Showroom</Link></li>
-                        <li><Link href="/commercial?type=buy&category=hotel" className="text-sm text-foreground hover:text-primary block">Buy Hotel</Link></li>
+                        <li><Link href="/commercial?transaction=buy&category=office" className="text-sm text-foreground hover:text-primary block">Buy Office</Link></li>
+                        <li><Link href="/commercial?transaction=buy&category=shop,showroom" className="text-sm text-foreground hover:text-primary block">Buy Shop/Showroom</Link></li>
+                        <li><Link href="/commercial?transaction=buy&category=hotel" className="text-sm text-foreground hover:text-primary block">Buy Hotel</Link></li>
                       </ul>
                     </div>
                     <div>
                       <h4 className="font-serif font-bold text-primary mb-2 border-b pb-1">Rent</h4>
                       <ul className="space-y-2">
-                        <li><Link href="/commercial?type=rent&category=coworking" className="text-sm text-foreground hover:text-primary block">Rent Co-working</Link></li>
-                        <li><Link href="/commercial?type=rent&category=managed" className="text-sm text-foreground hover:text-primary block">Rent Managed Office</Link></li>
-                        <li><Link href="/commercial?type=rent&category=shop" className="text-sm text-foreground hover:text-primary block">Rent Shop</Link></li>
+                        <li><Link href="/commercial?transaction=rent&category=co-working" className="text-sm text-foreground hover:text-primary block">Rent Co-working</Link></li>
+                        <li><Link href="/commercial?transaction=rent&category=managed-office" className="text-sm text-foreground hover:text-primary block">Rent Managed Office</Link></li>
+                        <li><Link href="/commercial?transaction=rent&category=shop" className="text-sm text-foreground hover:text-primary block">Rent Shop</Link></li>
                       </ul>
                     </div>
                   </motion.div>
@@ -136,15 +136,15 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     <div>
                       <h4 className="font-serif font-bold text-primary mb-2 border-b pb-1">Buy</h4>
                       <ul className="space-y-2">
-                        <li><Link href="/industrial?type=buy&category=warehouse" className="text-sm text-foreground hover:text-primary block">Buy Warehouse</Link></li>
-                        <li><Link href="/industrial?type=buy&category=factory" className="text-sm text-foreground hover:text-primary block">Buy Factory/Shed</Link></li>
+                        <li><Link href="/industrial?transaction=buy&category=warehouse" className="text-sm text-foreground hover:text-primary block">Buy Warehouse</Link></li>
+                        <li><Link href="/industrial?transaction=buy&category=factory" className="text-sm text-foreground hover:text-primary block">Buy Factory/Shed</Link></li>
                       </ul>
                     </div>
                     <div>
                       <h4 className="font-serif font-bold text-primary mb-2 border-b pb-1">Rent</h4>
                       <ul className="space-y-2">
-                        <li><Link href="/industrial?type=rent&category=warehouse" className="text-sm text-foreground hover:text-primary block">Rent Warehouse</Link></li>
-                        <li><Link href="/industrial?type=rent&category=industrial" className="text-sm text-foreground hover:text-primary block">Rent Industrial Space</Link></li>
+                        <li><Link href="/industrial?transaction=rent&category=warehouse" className="text-sm text-foreground hover:text-primary block">Rent Warehouse</Link></li>
+                        <li><Link href="/industrial?transaction=rent&category=industrial-plot" className="text-sm text-foreground hover:text-primary block">Rent Industrial Space</Link></li>
                       </ul>
                     </div>
                   </motion.div>
@@ -206,10 +206,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 {activeDropdown === 'm-res' && (
                   <div className="pl-4 py-2 space-y-3 bg-secondary/30 mt-2 rounded">
                     <p className="font-serif text-primary font-bold text-sm">Buy</p>
-                    <Link href="/residential" className="block text-foreground">Flats / Apartments</Link>
-                    <Link href="/residential" className="block text-foreground">Bungalows / Villas</Link>
+                    <Link href="/residential?transaction=buy&category=flat" className="block text-foreground">Flats / Apartments</Link>
+                    <Link href="/residential?transaction=buy&category=bungalow" className="block text-foreground">Bungalows / Villas</Link>
                     <p className="font-serif text-primary font-bold text-sm mt-4">Rent</p>
-                    <Link href="/residential" className="block text-foreground">Flats / Apartments</Link>
+                    <Link href="/residential?transaction=rent&category=flat" className="block text-foreground">Flats / Apartments</Link>
                   </div>
                 )}
               </div>
@@ -223,9 +223,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 </button>
                 {activeDropdown === 'm-com' && (
                   <div className="pl-4 py-2 space-y-3 bg-secondary/30 mt-2 rounded">
-                    <Link href="/commercial" className="block text-foreground">Office Spaces</Link>
-                    <Link href="/commercial" className="block text-foreground">Shops & Showrooms</Link>
-                    <Link href="/commercial" className="block text-foreground">Co-working Spaces</Link>
+                    <Link href="/commercial?category=office" className="block text-foreground">Office Spaces</Link>
+                    <Link href="/commercial?category=shop,showroom" className="block text-foreground">Shops & Showrooms</Link>
+                    <Link href="/commercial?transaction=rent&category=co-working" className="block text-foreground">Co-working Spaces</Link>
                   </div>
                 )}
               </div>
@@ -267,11 +267,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <div>
               <h4 className="text-lg font-serif font-semibold mb-6 text-white">Properties in Pune</h4>
               <ul className="space-y-3">
-                <li><Link href="/residential" className="text-white/70 hover:text-white transition-colors text-sm">Flats for Sale in Pune</Link></li>
-                <li><Link href="/residential" className="text-white/70 hover:text-white transition-colors text-sm">Bungalows for Sale</Link></li>
-                <li><Link href="/commercial" className="text-white/70 hover:text-white transition-colors text-sm">Commercial Offices for Rent</Link></li>
-                <li><Link href="/commercial" className="text-white/70 hover:text-white transition-colors text-sm">Shops for Sale</Link></li>
-                <li><Link href="/industrial" className="text-white/70 hover:text-white transition-colors text-sm">Warehouses in Chakan</Link></li>
+                <li><Link href="/residential?transaction=buy&category=flat" className="text-white/70 hover:text-white transition-colors text-sm">Flats for Sale in Pune</Link></li>
+                <li><Link href="/residential?transaction=buy&category=bungalow" className="text-white/70 hover:text-white transition-colors text-sm">Bungalows for Sale</Link></li>
+                <li><Link href="/commercial?transaction=rent&category=office" className="text-white/70 hover:text-white transition-colors text-sm">Commercial Offices for Rent</Link></li>
+                <li><Link href="/commercial?transaction=buy&category=shop" className="text-white/70 hover:text-white transition-colors text-sm">Shops for Sale</Link></li>
+                <li><Link href="/search?q=Chakan+warehouse" className="text-white/70 hover:text-white transition-colors text-sm">Warehouses in Chakan</Link></li>
               </ul>
             </div>
 

@@ -11,6 +11,7 @@ import Residential from "@/pages/residential";
 import Commercial from "@/pages/commercial";
 import Industrial from "@/pages/industrial";
 import Projects from "@/pages/projects";
+import SearchResults from "@/pages/search";
 import ProjectDetail from "@/pages/project-detail";
 import Contact from "@/pages/contact";
 import AdminLogin from "@/pages/admin/login";
@@ -48,6 +49,7 @@ function App() {
                   <Switch>
                     <Route path="/" component={Home} />
                     <Route path="/about" component={About} />
+                    <Route path="/search" component={SearchResults} />
                     <Route path="/residential" component={Residential} />
                     <Route path="/commercial" component={Commercial} />
                     <Route path="/industrial" component={Industrial} />

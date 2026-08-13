@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronRight, MapPin, SlidersHorizontal, PhoneCall, Building2 } from "lucide-react";
@@ -8,6 +8,9 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { fetchProperties, primaryImage, areaLabel, categoryLabel } from "@/lib/api";
+import { matchesPropertyQuery } from "@/lib/search";
+import { useListingFilters } from "@/hooks/use-listing-filters";
+import ListingSearch from "@/components/listing-search";
 import type { Property } from "@/lib/types";
 import Seo from "@/components/seo";
 import { PAGE_SEO, breadcrumbSchema } from "@/lib/seo";
@@ -16,10 +19,14 @@ const TYPE_OPTIONS = ["warehouse", "factory", "industrial-plot", "cold-storage"]
 const HUBS = ["Chakan", "Ranjangaon", "Bhosari", "Talegaon", "Sanaswadi", "Baramati"];
 
 export default function Industrial() {
-  const [transaction, setTransaction] = useState<"buy" | "rent">("buy");
-  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+  const { query, setQuery, transaction, setTransaction, urlCategories } = useListingFilters();
+  const [selectedTypes, setSelectedTypes] = useState<string[]>(urlCategories);
   const [selectedHubs, setSelectedHubs] = useState<string[]>([]);
-  const [appliedFilters, setAppliedFilters] = useState(0);
+
+  // Follow category links from the nav / home page after the page is mounted.
+  useEffect(() => {
+    setSelectedTypes(urlCategories);
+  }, [urlCategories]);
 
   const { data: properties = [], isLoading, isError } = useQuery({
     queryKey: ["properties", "industrial", transaction],
@@ -31,13 +38,21 @@ export default function Industrial() {
   }
 
   const filtered = useMemo(() => {
-    void appliedFilters;
     return properties.filter((p) => {
+      if (!matchesPropertyQuery(p, query)) return false;
       if (selectedTypes.length && !selectedTypes.includes(p.category)) return false;
       if (selectedHubs.length && !selectedHubs.some((l) => p.location.toLowerCase().includes(l.toLowerCase()))) return false;
       return true;
     });
-  }, [properties, selectedTypes, selectedHubs, appliedFilters]);
+  }, [properties, query, selectedTypes, selectedHubs]);
+
+  const hasFilters = query !== "" || selectedTypes.length > 0 || selectedHubs.length > 0;
+
+  function clearAll() {
+    setQuery("");
+    setSelectedTypes([]);
+    setSelectedHubs([]);
+  }
 
   return (
     <div className="bg-secondary/20 min-h-screen pb-20">
@@ -62,7 +77,9 @@ export default function Industrial() {
             <div>
               <h1 className="text-2xl md:text-3xl font-serif font-bold text-foreground">Industrial & Warehousing</h1>
               <p className="text-muted-foreground text-sm mt-1">
-                {isLoading ? "Loading properties…" : `Showing ${filtered.length} Industrial ${filtered.length === 1 ? "Property" : "Properties"} in Pune`}
+                {isLoading
+                  ? "Loading properties…"
+                  : `Showing ${filtered.length} Industrial ${filtered.length === 1 ? "Property" : "Properties"}${query ? ` for "${query}"` : ""} in Pune`}
               </p>
             </div>
             <Tabs value={transaction} onValueChange={(v) => setTransaction(v as "buy" | "rent")} className="w-[200px]">
@@ -72,6 +89,13 @@ export default function Industrial() {
               </TabsList>
             </Tabs>
           </div>
+
+          <ListingSearch
+            value={query}
+            onChange={setQuery}
+            placeholder="Search warehouses, factories, industrial hubs…"
+            className="mt-5 max-w-xl"
+          />
         </div>
       </div>
 
@@ -109,12 +133,12 @@ export default function Industrial() {
                 </div>
               </div>
               
-              <Button
-                className="w-full mt-4 bg-primary hover:bg-primary/90 text-white"
-                onClick={() => setAppliedFilters((n) => n + 1)}
-              >
-                Apply Filters
-              </Button>
+              {/* Filters apply as you pick them — this only resets everything. */}
+              {hasFilters && (
+                <Button variant="outline" className="w-full mt-4" onClick={clearAll}>
+                  Clear all filters
+                </Button>
+              )}
             </div>
           </aside>
 
@@ -133,8 +157,15 @@ export default function Industrial() {
             ) : filtered.length === 0 ? (
               <div className="text-center py-20 text-muted-foreground">
                 <Building2 size={40} className="mx-auto mb-3 opacity-30" />
-                <p className="font-medium">No industrial properties match your filters</p>
+                <p className="font-medium">
+                  {query ? `No industrial properties match "${query}"` : "No industrial properties match your filters"}
+                </p>
                 <p className="text-sm mt-1">Try widening your search criteria.</p>
+                {hasFilters && (
+                  <Button variant="outline" className="mt-4" onClick={clearAll}>
+                    Clear all filters
+                  </Button>
+                )}
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import AdminLayout from "@/components/admin-layout";
 import { adminFetch, isAdminLoggedIn } from "@/lib/adminAuth";
+import { matchesContactQuery } from "@/lib/search";
 import type { Contact } from "@/lib/types";
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; dot: string }> = {
@@ -151,12 +152,7 @@ export default function AdminContacts() {
     if (filterInterest !== "all") list = list.filter((c) => c.interest === filterInterest);
     if (filterStatus !== "all") list = list.filter((c) => c.leadStatus === filterStatus);
     if (search.trim()) {
-      const q = search.toLowerCase();
-      list = list.filter((c) =>
-        c.name.toLowerCase().includes(q) ||
-        c.email.toLowerCase().includes(q) ||
-        c.phone.includes(q)
-      );
+      list = list.filter((c) => matchesContactQuery(c, search));
     }
     list.sort((a, b) => {
       if (sortBy === "name") return a.name.localeCompare(b.name);

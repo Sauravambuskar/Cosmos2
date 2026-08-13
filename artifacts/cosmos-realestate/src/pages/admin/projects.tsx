@@ -3,6 +3,7 @@ import { useLocation } from "wouter";
 import { Plus, Pencil, Trash2, Star, Search, Filter, Building2 } from "lucide-react";
 import AdminLayout from "@/components/admin-layout";
 import { adminFetch, isAdminLoggedIn } from "@/lib/adminAuth";
+import { matchesProjectQuery } from "@/lib/search";
 import type { Project } from "@/lib/types";
 
 export default function AdminProjects() {
@@ -62,10 +63,8 @@ export default function AdminProjects() {
   }
 
   const filtered = projects.filter((p) => {
-    const matchesSearch = p.name.toLowerCase().includes(search.toLowerCase()) ||
-      p.location.toLowerCase().includes(search.toLowerCase());
     const matchesType = typeFilter === "all" || p.type.toLowerCase() === typeFilter;
-    return matchesSearch && matchesType;
+    return matchesType && matchesProjectQuery(p, search);
   });
 
   return (

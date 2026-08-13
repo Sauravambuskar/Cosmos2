@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronRight, MapPin, SlidersHorizontal, Heart, PhoneCall, Building2 } from "lucide-react";
@@ -9,6 +9,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { fetchProperties, primaryImage, areaLabel, categoryLabel } from "@/lib/api";
+import { matchesPropertyQuery } from "@/lib/search";
+import { useListingFilters } from "@/hooks/use-listing-filters";
+import ListingSearch from "@/components/listing-search";
 import type { Property } from "@/lib/types";
 import Seo from "@/components/seo";
 import { PAGE_SEO, breadcrumbSchema } from "@/lib/seo";
@@ -21,14 +24,19 @@ const AREA_BUCKETS = [
   { label: "5,000 - 10,000", min: 5000, max: 10000 },
   { label: "10,000+", min: 10000, max: Infinity },
 ];
+const MAX_BUDGET = 10000; // ₹ lakhs — the slider's ceiling doubles as "no budget filter"
 
 export default function Commercial() {
-  const [budget, setBudget] = useState([5000]);
-  const [transaction, setTransaction] = useState<"buy" | "rent">("buy");
-  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+  const { query, setQuery, transaction, setTransaction, urlCategories } = useListingFilters();
+  const [budget, setBudget] = useState([MAX_BUDGET]);
+  const [selectedTypes, setSelectedTypes] = useState<string[]>(urlCategories);
   const [selectedHubs, setSelectedHubs] = useState<string[]>([]);
   const [selectedAreas, setSelectedAreas] = useState<string[]>([]);
-  const [appliedFilters, setAppliedFilters] = useState(0);
+
+  // Follow category links from the nav / home page after the page is mounted.
+  useEffect(() => {
+    setSelectedTypes(urlCategories);
+  }, [urlCategories]);
 
   const { data: properties = [], isLoading, isError } = useQuery({
     queryKey: ["properties", "commercial", transaction],
@@ -40,18 +48,33 @@ export default function Commercial() {
   }
 
   const filtered = useMemo(() => {
-    void appliedFilters;
     return properties.filter((p) => {
+      if (!matchesPropertyQuery(p, query)) return false;
       if (selectedTypes.length && !selectedTypes.includes(p.category)) return false;
       if (selectedHubs.length && !selectedHubs.some((l) => p.location.toLowerCase().includes(l.toLowerCase()))) return false;
       if (selectedAreas.length) {
         const buckets = AREA_BUCKETS.filter((b) => selectedAreas.includes(b.label));
         if (!buckets.some((b) => p.area >= b.min && p.area < b.max)) return false;
       }
-      if (p.priceValue > budget[0]) return false;
+      if (budget[0] < MAX_BUDGET && p.priceValue > budget[0]) return false;
       return true;
     });
-  }, [properties, selectedTypes, selectedHubs, selectedAreas, budget, appliedFilters]);
+  }, [properties, query, selectedTypes, selectedHubs, selectedAreas, budget]);
+
+  const hasFilters =
+    query !== "" ||
+    selectedTypes.length > 0 ||
+    selectedHubs.length > 0 ||
+    selectedAreas.length > 0 ||
+    budget[0] < MAX_BUDGET;
+
+  function clearAll() {
+    setQuery("");
+    setSelectedTypes([]);
+    setSelectedHubs([]);
+    setSelectedAreas([]);
+    setBudget([MAX_BUDGET]);
+  }
 
   return (
     <div className="bg-secondary/20 min-h-screen pb-20">
@@ -77,7 +100,9 @@ export default function Commercial() {
             <div>
               <h1 className="text-2xl md:text-3xl font-serif font-bold text-foreground">Commercial Properties in Pune</h1>
               <p className="text-muted-foreground text-sm mt-1">
-                {isLoading ? "Loading spaces…" : `Showing ${filtered.length} Commercial ${filtered.length === 1 ? "Space" : "Spaces"}`}
+                {isLoading
+                  ? "Loading spaces…"
+                  : `Showing ${filtered.length} Commercial ${filtered.length === 1 ? "Space" : "Spaces"}${query ? ` for "${query}"` : ""}`}
               </p>
             </div>
             <Tabs value={transaction} onValueChange={(v) => setTransaction(v as "buy" | "rent")} className="w-[200px]">
@@ -87,6 +112,13 @@ export default function Commercial() {
               </TabsList>
             </Tabs>
           </div>
+
+          <ListingSearch
+            value={query}
+            onChange={setQuery}
+            placeholder="Search offices, shops, commercial hubs…"
+            className="mt-5 max-w-xl"
+          />
         </div>
       </div>
 
@@ -117,11 +149,11 @@ export default function Commercial() {
               <div className="mb-6">
                 <h3 className="font-semibold text-foreground mb-4 text-sm flex justify-between">
                   <span>Max Budget</span>
-                  <span className="text-primary font-bold">₹{budget[0]} L</span>
+                  <span className="text-primary font-bold">{budget[0] >= MAX_BUDGET ? "Any" : `₹${budget[0]} L`}</span>
                 </h3>
                 <Slider
                   value={budget}
-                  max={10000}
+                  max={MAX_BUDGET}
                   step={50}
                   onValueChange={setBudget}
                   className="mb-2"
@@ -154,12 +186,12 @@ export default function Commercial() {
                 </div>
               </div>
               
-              <Button
-                className="w-full mt-4 bg-primary hover:bg-primary/90 text-white"
-                onClick={() => setAppliedFilters((n) => n + 1)}
-              >
-                Apply Filters
-              </Button>
+              {/* Filters apply as you pick them — this only resets everything. */}
+              {hasFilters && (
+                <Button variant="outline" className="w-full mt-4" onClick={clearAll}>
+                  Clear all filters
+                </Button>
+              )}
             </div>
           </aside>
 
@@ -178,8 +210,15 @@ export default function Commercial() {
             ) : filtered.length === 0 ? (
               <div className="text-center py-20 text-muted-foreground">
                 <Building2 size={40} className="mx-auto mb-3 opacity-30" />
-                <p className="font-medium">No commercial spaces match your filters</p>
+                <p className="font-medium">
+                  {query ? `No commercial spaces match "${query}"` : "No commercial spaces match your filters"}
+                </p>
                 <p className="text-sm mt-1">Try widening your search criteria.</p>
+                {hasFilters && (
+                  <Button variant="outline" className="mt-4" onClick={clearAll}>
+                    Clear all filters
+                  </Button>
+                )}
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
