@@ -17,6 +17,7 @@ const outDir = resolve(here, "..", "dist", "public");
 // changefreq/priority are hints; listing pages change more often than About.
 const staticRoutes = [
   { path: "/", changefreq: "daily", priority: "1.0" },
+  { path: "/featured-properties", changefreq: "weekly", priority: "0.9" },
   { path: "/residential", changefreq: "daily", priority: "0.9" },
   { path: "/commercial", changefreq: "daily", priority: "0.9" },
   { path: "/industrial", changefreq: "daily", priority: "0.9" },

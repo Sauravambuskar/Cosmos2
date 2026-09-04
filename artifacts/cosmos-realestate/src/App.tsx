@@ -7,6 +7,7 @@ import Layout from "@/components/layout";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import About from "@/pages/about";
+import FeaturedProperties from "@/pages/featured-properties";
 import Residential from "@/pages/residential";
 import Commercial from "@/pages/commercial";
 import Industrial from "@/pages/industrial";
@@ -54,6 +55,7 @@ function App() {
                     <Route path="/" component={Home} />
                     <Route path="/about" component={About} />
                     <Route path="/search" component={SearchResults} />
+                    <Route path="/featured-properties" component={FeaturedProperties} />
                     <Route path="/residential" component={Residential} />
                     <Route path="/commercial" component={Commercial} />
                     <Route path="/industrial" component={Industrial} />

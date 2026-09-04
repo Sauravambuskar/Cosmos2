@@ -109,6 +109,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <Link href="/" className={`text-sm font-semibold transition-colors hover:text-primary ${location === "/" ? "text-primary" : "text-foreground"}`}>
               Home
             </Link>
+            <Link href="/featured-properties" className={`text-sm font-semibold transition-colors hover:text-primary ${location === "/featured-properties" ? "text-primary" : "text-foreground"}`}>
+              Featured
+            </Link>
             
             {/* Residential Dropdown */}
             <div className="relative group" onMouseEnter={() => setActiveDropdown('residential')} onMouseLeave={() => setActiveDropdown(null)}>
@@ -262,6 +265,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             </div>
             <nav className="flex flex-col p-4 gap-2">
               <Link href="/" className="text-lg font-semibold py-3 border-b">Home</Link>
+              <Link href="/featured-properties" className="text-lg font-semibold py-3 border-b">Featured Properties</Link>
               
               <div className="py-2 border-b">
                 <button 

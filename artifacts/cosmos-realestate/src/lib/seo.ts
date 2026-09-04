@@ -59,6 +59,14 @@ export const PAGE_SEO: Record<string, PageSeo> = {
     path: "/about",
     keywords: "about Cosmos Real Estate, NAR India certified broker Pune, property consultant Pune",
   },
+  featuredProperties: {
+    title: "Featured Properties in Pune | Cosmos Real Estate",
+    description:
+      "Handpicked properties currently on offer in Pune - luxury flats and bungalows in Koregaon Park, high-street shops and showrooms, Grade A warehouses in Talegaon and MIDC land in Chakan.",
+    path: "/featured-properties",
+    keywords:
+      "featured properties Pune, property deals Pune, luxury flats Koregaon Park, shop for sale Pune, Grade A warehouse Talegaon, MIDC land Chakan",
+  },
   residential: {
     title: "Residential Property in Pune | Flats, Bungalows & Row Houses",
     description:
